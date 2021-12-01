@@ -1,43 +1,31 @@
 package frame.socket;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SocketServer {
-    private static final int PORT = 6789;
-    private ServerSocket server;
-    private ExecutorService threadPool;
-    public SocketServer() throws IOException {
-        server = new ServerSocket(PORT);
-        System.out.println("Server started.");
-        threadPool = Executors.newFixedThreadPool(10);
-        while (true) {
-            Socket socket = server.accept();
+    public static void main(String[] args) {
+        try {
+            ServerSocket ss = new ServerSocket(8888);
+            System.out.println("启动服务器....");
+            Socket s = ss.accept();
+            System.out.println("客户端:" + InetAddress.getLocalHost() + "已连接到服务器");
 
-            Runnable runnable=()->{
-                try {
-                    InputStream inputStream = socket.getInputStream();
-                    byte[] bytes = new byte[1024];
-                    int len;
-                    StringBuilder sb = new StringBuilder();
-                    while ((len = inputStream.read(bytes)) != -1) {
-                        sb.append(new String(bytes, 0, len, "UTF-8"));
-                    }
-                    System.out.println("get message from client: " + sb);
-                    inputStream.close();
-                    socket.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            };
-            threadPool.submit(runnable);
+            BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            //读取客户端发送来的消息
+            String mess = br.readLine();
+            System.out.println("客户端：" + mess);
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+            bw.write(mess + "\n");
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
-    public void close() {
-        threadPool.shutdown();
     }
 }

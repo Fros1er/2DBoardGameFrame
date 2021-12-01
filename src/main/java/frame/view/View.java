@@ -1,8 +1,7 @@
 package frame.view;
 
-import frame.board.Grid;
+import frame.board.BaseGrid;
 import frame.event.EventCenter;
-import frame.controller.Saver;
 import frame.event.GameEndEvent;
 import frame.event.PlayerLoseEvent;
 import frame.event.PlayerWinEvent;
@@ -11,7 +10,6 @@ import frame.util.Procedure;
 import frame.view.board.BoardViewFactory;
 import frame.view.board.GridViewFactory;
 import frame.view.stage.*;
-import javafx.scene.media.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,12 +29,11 @@ public class View {
     public static final JFrame window = new JFrame();
     public static final CardLayout layout = new CardLayout();
     public static final JPanel sceneHolder = new JPanel(layout);
-    public static MediaPlayer bgm = null;
+//    public static MediaPlayer bgm = null;
 
     private static final Map<String, BaseStage> stages = new HashMap<>();
     private static BaseStage currentStage = null;
 
-    public static Saver saver = Saver.instance();
     public static GridViewFactory gridViewFactory;
     public static BoardViewFactory boardViewFactory;
 
@@ -54,6 +51,7 @@ public class View {
         addStage("LoadStage", LoadStage.instance());
         addStage("RoomStage", RoomStage.instance());
         addStage("GameStage", GameStage.instance());
+        addStage("RankingStage", RankingStage.instance());
 
         layout.show(sceneHolder, "MenuStage");
         currentStage = MenuStage.instance();
@@ -94,7 +92,7 @@ public class View {
         //bgm = new MediaPlayer(new Media(path));
     }
 
-    public static <T extends Grid> void setGridViewPattern(GridViewFactory<T> factory) {
+    public static <T extends BaseGrid> void setGridViewPattern(GridViewFactory<T> factory) {
         gridViewFactory = factory;
     }
 
@@ -116,6 +114,7 @@ public class View {
         LoadStage.instance().init();
         RoomStage.instance().init();
         GameStage.instance().init();
+        RankingStage.instance().init();
 
         EventCenter.subscribe(PlayerWinEvent.class, (e) -> onPlayerWin.accept(((PlayerWinEvent) e).getPlayer()));
         EventCenter.subscribe(PlayerLoseEvent.class, (e) -> onPlayerLose.accept(((PlayerLoseEvent) e).getPlayer()));

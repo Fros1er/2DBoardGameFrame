@@ -1,44 +1,92 @@
 package frame.view.stage;
 
 import frame.Game;
-import frame.player.Player;
+import frame.socket.OnlineType;
 import frame.view.View;
+import frame.view.components.RoomBlock;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.event.ItemEvent;
 
 public class RoomStage extends BaseStage {
     private static volatile RoomStage sInstance = null;
 
+    public final JPanel settingsRow = new JPanel();
+    public final JPanel playerRows = new JPanel();
+    public final JPanel buttonRows = new JPanel();
+
     public RoomBlock[] roomBlocks = null;
     public final JButton back = new JButton("Back");
     public final JButton start = new JButton("Start");
     public final JCheckBox online = new JCheckBox("Allow LAN");
+    public final JTextField textWidth = new JTextField(4);
+    public final JTextField textHeight = new JTextField(4);
+
+    private void parseSizeString() {
+        if (textWidth.getText().isEmpty() || textHeight.getText().isEmpty()) return;
+        Game.setBoardSize(Integer.parseInt(textWidth.getText()), Integer.parseInt(textHeight.getText()));
+    }
 
     private RoomStage() {
         super("RoomStage");
-        online.addItemListener((e) -> Game.setOnlineStatus(e.getStateChange() == ItemEvent.SELECTED));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        online.addItemListener((e) ->
+                Game.setOnlineType((e.getStateChange() == ItemEvent.SELECTED) ? OnlineType.SERVER : OnlineType.NONE));
         back.addActionListener((e) -> View.changeStage("MenuStage"));
         start.addActionListener((e) -> View.changeStage("GameStage"));
-        this.add(online);
-        this.add(back);
-        this.add(start);
+
+        DocumentListener sizeListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                parseSizeString();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                parseSizeString();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                parseSizeString();
+            }
+        };
+        textWidth.getDocument().addDocumentListener(sizeListener);
+        textHeight.getDocument().addDocumentListener(sizeListener);
+
+        settingsRow.add(textWidth);
+        settingsRow.add(textHeight);
+        settingsRow.add(online);
+        buttonRows.add(back);
+        buttonRows.add(start);
+        playerRows.setLayout(new BoxLayout(playerRows, BoxLayout.Y_AXIS));
+
+        this.add(settingsRow);
+        this.add(playerRows);
+        this.add(buttonRows);
     }
 
     @Override
     public void init() {
+        textWidth.setText(String.valueOf(Game.getWidth()));
+        textHeight.setText(String.valueOf(Game.getHeight()));
         roomBlocks = new RoomBlock[Game.getMaximumPlayerNumber()];
-        for(int i = 0; i < Game.getMaximumPlayerNumber(); i++) {
-            roomBlocks[i] = new RoomBlock(i);
-            this.add(roomBlocks[i]);
-        }
     }
 
     @Override
     public void enter() {
         for (int i = 0; i < Game.getMaximumPlayerNumber(); i++) {
-            roomBlocks[i].usePlayer(Game.getPlayer(i));
+            roomBlocks[i] = new RoomBlock(i);
+            playerRows.add(roomBlocks[i]);
         }
+    }
+
+    @Override
+    public void exit() {
+        playerRows.removeAll();
     }
 
     public static RoomStage instance() {
@@ -50,68 +98,5 @@ public class RoomStage extends BaseStage {
             }
         }
         return sInstance;
-    }
-
-    public static class RoomBlock extends JPanel {
-
-        public final int id;
-        private Player p;
-
-        public JPanel normalPanel = new JPanel();
-        public JLabel prefix = new JLabel("");
-        public JLabel title;
-        public JLabel name = new JLabel("");
-        public JCheckBox ready = new JCheckBox("Ready?");
-
-        public JPanel createPanel = new JPanel();
-        public JTextField newPlayerName = new JTextField(16);
-        public JComboBox<String> newPlayerType;
-        public JButton create = new JButton("New Player");
-
-        public RoomBlock(int id) {
-            this.id = id;
-            title = new JLabel("Player " + id);
-            ready.addItemListener((e) -> {
-                p.setReady(e.getStateChange() == ItemEvent.SELECTED);
-            });
-
-            normalPanel.add(prefix);
-            normalPanel.add(title);
-            normalPanel.add(name);
-            normalPanel.add(ready);
-
-
-            newPlayerType = new JComboBox<>(Player.playerTypes.keySet().toArray(new String[0]));
-            create.addActionListener((e) -> {
-                p = Player.getPlayer((String) newPlayerType.getSelectedItem(), id, newPlayerName.getText());
-                Game.setPlayer(id, p);
-                usePlayer(p);
-            });
-
-            createPanel.add(newPlayerName);
-            createPanel.add(newPlayerType);
-            createPanel.add(create);
-
-            this.add(normalPanel);
-            this.add(createPanel);
-        }
-
-        public void usePlayer(Player p) {
-
-            if (p == null) {
-                normalPanel.setVisible(false);
-                createPanel.setVisible(true);
-            } else {
-                createPanel.setVisible(false);
-                normalPanel.setVisible(true);
-                prefix.setText(p.getType());
-                ready.setSelected(p.isReady());
-                if (!p.getType().equals("LOCAL")) {
-                    ready.setEnabled(false);
-                }
-                name.setText(p.getName());
-            }
-            this.p = p;
-        }
     }
 }

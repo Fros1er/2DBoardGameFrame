@@ -1,49 +1,56 @@
 package frame.player;
 
-//import action.MapAction;
-//import controller.Vars;
+import frame.Game;
 
-public class AIPlayer extends Player {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.*;
 
-    public AIPlayer(int id) {
-        this(id, "Computer");
-    }
+public abstract class AIPlayer extends Player {
 
-    public AIPlayer(int id, String name) {
-        super(id, name, "AI");
+    private final int delay;
+
+    public AIPlayer(int id, String name, int delay) {
+        super(id, name, PlayerType.AI);
         setReady(true);
+        this.delay = delay;
     }
 
-//    @Override
-//    public void onNotify() {
-//        sendNextMove();
-//    }
+    @Override
+    public void onNotify() {
+        Thread t = new Thread(() -> {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (!calculateNextMove()) {
+                surrender();
+            }
+        });
+        t.start();
+    }
 
-//    public MapAction calculateNextMove() {
-//        return new MapAction(0, 0, MapAction.ClickType.LEFT);
-//    }
-//
-//    public void sendNextMove() {
-//        Thread t = new Thread(new sender(calculateNextMove()), "sender");
-//        t.start();
-//    }
+    protected boolean performGridAction(int x, int y, int button) {
+        return Game.performAction(Game.getBoard().getGrid(x, y).actionFactory.createAction(x, y, button));
+    }
 
+    protected abstract boolean calculateNextMove();
 
-//    static class sender implements Runnable{
-//        private final MapAction action;
-//        public sender(MapAction a) {
-//            action = a;
-//        }
-//        @Override
-//        public void run() {
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } finally {
-//                Vars.publisher.submit(action);
-//            }
-//
-//        }
-//    }
+    private static final Map<String, Function<Integer, AIPlayer>> aiFactories = new HashMap<>();
+
+    public static void addAIType(String name, Function<Integer, AIPlayer> aiFactory) {
+        aiFactories.put(name, aiFactory);
+    }
+
+    public static AIPlayer getAIPlayer(int id, String name) {
+        System.out.println(name);
+        return aiFactories.get(name).apply(id);
+    }
+
+    public static Set<String> getAllAINames() {
+        return aiFactories.keySet();
+    }
+
 }

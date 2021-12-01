@@ -3,118 +3,241 @@ package frame;
 import frame.action.Action;
 import frame.action.ActionFactory;
 import frame.action.Range;
-import frame.board.Board;
-import frame.board.Grid;
-import frame.event.EventCenter;
-import frame.event.BoardChangeEvent;
-import frame.event.PlayerLoseEvent;
-import frame.event.PlayerWinEvent;
-import frame.item.BaseItem;
+import frame.action.SurrenderAction;
+import frame.board.BaseBoard;
+import frame.player.PlayerManager;
+import frame.save.Save;
+import frame.save.Saver;
+import frame.event.*;
 import frame.player.Player;
+import frame.socket.Client;
+import frame.socket.OnlineType;
+import frame.socket.Server;
 import frame.util.Procedure;
+import frame.view.stage.GameStage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Constructor;
+import java.util.Stack;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
 public class Game {
 
-    private static int maximumPlayer = 2;
-    private static boolean AIStatus = false;
-    private static boolean onlineStatus = false;
-    private static Player[] players = new Player[2];
-    public static final List<BaseItem> items = new ArrayList<>();
-    private static Player currentPlayer;
+    private static OnlineType onlineType = OnlineType.NONE;
+    private static boolean isGameEnd = true;
+    private static final Stack<Action> actionStack = new Stack<>();
+    private static BaseBoard board;
+    private static Constructor<? extends BaseBoard> boardConstructor;
+    private static Predicate<Player> playerWinningJudge;
+    private static Predicate<Player> playerLosingJudge;
+    private static BooleanSupplier gameEndingJudge = PlayerManager::isOnePlayerWin;
+    private static Procedure gameEndFunction = () -> {};
+    private static Procedure initFunction = () -> {
+    };
+    private static Procedure gridActionRegister = () -> {};
+    private static int width;
+    private static int height;
 
-    private static Board board;
-    private static Predicate<Player> playerWinningFunction;
-    private static Predicate<Player> playerLosingFunction;
-    private static Procedure initFunction = () -> {};
+    private static Save fromSave = null;
 
-    private Game() {}
+    public static final Object controllerSource = new Object();
+
+    private Game() {
+    }
 
     public static void init() {
+        isGameEnd = false;
+        try {
+            board = boardConstructor.newInstance(width, height);
+            board.init();
+            gridActionRegister.invoke();
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
+        PlayerManager.reviveAllPlayers();
         initFunction.invoke();
-    }
-
-    public static void registerBoard(Board board) {
-        Game.board = board;
-        board.init();
-    }
-
-    public static Board getBoard() {
-        return board;
-    }
-
-    public static <T extends Grid> void registerGridAction(Range range, ActionFactory<T> factory) {
-        for (int x = 0; x < board.getWidth(); x++) {
-            for (int y = 0; y < board.getHeight(); y++) {
-                if (range.inRange(x, y)) {
-                    board.getGrid(x, y).actionFactoryList.add(factory);
+        if (fromSave != null) {
+            Thread t = new Thread(() -> {
+                for (Action action : fromSave.actionStack) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    performAction(action);
                 }
-            }
+            });
+            t.start();
+        } else {
+            PlayerManager.getCurrentPlayer().onNotify();
+        }
+        EventCenter.publish(new BoardChangeEvent(GameStage.instance()));
+    }
+
+    public static void registerBoard(Class<? extends BaseBoard> board) {
+        try {
+            boardConstructor = board.getConstructor(int.class, int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            System.err.println("Class doesn't extended BaseBoard!");
         }
     }
 
-    public static void setPlayerWinningFunction(Predicate<Player> predicate) {
-        playerWinningFunction = predicate;
+    public static BaseBoard getBoard() {
+        return board;
     }
-    public static void setPlayerLosingFunction(Predicate<Player> predicate) {
-        playerLosingFunction = predicate;
+
+    public static void registerGridAction(Range range, ActionFactory factory) {
+        gridActionRegister = () -> {
+            for (int x = 0; x < board.getWidth(); x++) {
+                for (int y = 0; y < board.getHeight(); y++) {
+                    if (range.inRange(x, y)) {
+                        if (board.getGrid(x, y).actionFactory != null) {
+                            System.err.println("Warning: Illegally overriding action in grid " + x + " " + y);
+                        }
+                        board.getGrid(x, y).actionFactory = factory;
+                    }
+                }
+            }
+        };
+    }
+
+    public static void setPlayerWinningJudge(Predicate<Player> predicate) {
+        playerWinningJudge = predicate;
+    }
+
+    public static void setPlayerLosingJudge(Predicate<Player> predicate) {
+        playerLosingJudge = predicate;
+    }
+
+    public static void setGameEndingJudge(BooleanSupplier supplier) {
+        gameEndingJudge = supplier;
     }
 
     public static void setInitFunction(Procedure procedure) {
         initFunction = procedure;
     }
 
-    public static void performAction(Action action) {
-        if (action == null) return;
-        if (!action.perform()) return;
+    public static void setGameEndFunction(Procedure procedure) {
+        gameEndFunction = procedure;
+    }
 
-        if (playerWinningFunction.test(currentPlayer)) {
+    public static boolean performAction(Action action) {
+        if (action == null) return false;
+
+        if (isClient()) {
+            Client.sendAction(action);
+            return true;
+        }
+
+        if (!action.perform()) return false;
+        Player currentPlayer = getCurrentPlayer();
+        if (playerWinningJudge.test(currentPlayer)) {
+            currentPlayer.win();
+            action.setChangedPlayer(currentPlayer);
             EventCenter.publish(new PlayerWinEvent(action, currentPlayer));
         }
-        if (playerLosingFunction.test(currentPlayer)) {
+        if (playerLosingJudge.test(currentPlayer)) {
+            currentPlayer.lose();
+            action.setChangedPlayer(currentPlayer);
             EventCenter.publish(new PlayerLoseEvent(action, currentPlayer));
         }
-        if (action.endTurn) nextTurn();
-
+        if (gameEndingJudge.getAsBoolean()) {
+            isGameEnd = true;
+            gameEndFunction.invoke();
+            EventCenter.publish(new GameEndEvent(action));
+        }
+        actionStack.push(action);
         EventCenter.publish(new BoardChangeEvent(action));
+        if (action.endTurn && !isGameEnd) nextTurn();
+        return true;
+    }
+
+    public static void cancelLastAction() {
+
+        if (isClient()) {
+            Client.sendCancel();
+            return;
+        }
+
+        if (actionStack.isEmpty() || isGameEnd) return;
+        Action lastAction = actionStack.pop();
+        lastAction.undo();
+        while ((lastAction instanceof SurrenderAction) && !actionStack.isEmpty()) {
+            lastAction.undo();
+            if (lastAction.getChangedPlayer() != null) {
+                lastAction.getChangedPlayer().revive();
+            }
+            lastAction = actionStack.pop();
+        }
+        if (lastAction.endTurn) previousTurn();
+        EventCenter.publish(new BoardChangeEvent(lastAction));
+    }
+
+    public static void nextTurn() {
+        PlayerManager.nextPlayer();
+    }
+
+    public static void previousTurn() {
+        PlayerManager.previousPlayer();
+    }
+
+    public static void setOnlineType(OnlineType type) {
+        onlineType = type;
+        if (type == OnlineType.SERVER) {
+            Server.startService();
+        } else {
+            Server.stopAllService();
+        }
+    }
+
+    public static boolean isServer() {
+        return onlineType == OnlineType.SERVER;
+    }
+
+    public static boolean isClient() {
+        return onlineType == OnlineType.CLIENT;
+    }
+
+
+    //PlayerManager proxies
+    public static void setMaximumPlayer(int maximumPlayer) {
+        PlayerManager.setMaximumPlayer(maximumPlayer);
     }
 
     public static int getMaximumPlayerNumber() {
-        return maximumPlayer;
+        return PlayerManager.getMaximumPlayerNumber();
     }
 
-    public static Player getPlayer(int i) {
-        return players[i];
-    }
-    public static void setPlayer(int pos, Player p) {
-        players[pos] = p;
-    }
-    public static void nextTurn() {}
-
-    public static void setMaximumPlayer(int maximumPlayer) {
-        assert maximumPlayer > 0;
-        Player[] players = new Player[maximumPlayer];
-        System.arraycopy(Game.players, 0, players, 0, Math.min(maximumPlayer, Game.maximumPlayer));
-        Game.maximumPlayer = maximumPlayer;
-        Game.players = players;
+    public static Player getCurrentPlayer() {
+        return PlayerManager.getCurrentPlayer();
     }
 
-    public static void setAIStatus(boolean AIStatus) {
-        Game.AIStatus = AIStatus;
+    public static int getCurrentPlayerIndex() {
+        return PlayerManager.getCurrentPlayerIndex();
     }
 
-    public static boolean isAIEnabled() {
-        return Game.AIStatus;
+    //Saver proxies
+
+    public static void saveGame(String path) {
+        Saver.save(new Save(actionStack), path);
     }
 
-    public static void setOnlineStatus(boolean onlineStatus) {
-        Game.onlineStatus = onlineStatus;
+    public static void loadGame(String path) {
+        fromSave = Saver.load(path);
+        setBoardSize(fromSave.width, fromSave.height);
     }
 
-    public static boolean isOnlineEnabled() {
-        return Game.onlineStatus;
+    public static void setBoardSize(int width, int height) {
+        Game.width = width;
+        Game.height = height;
+    }
+
+    public static int getHeight() {
+        return height;
+    }
+
+    public static int getWidth() {
+        return width;
     }
 }

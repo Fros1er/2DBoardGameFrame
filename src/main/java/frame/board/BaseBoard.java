@@ -1,19 +1,19 @@
 package frame.board;
 
-public abstract class Board {
+public abstract class BaseBoard {
 
     private final int width, height;
-    protected final Grid[][] grids;
+    protected final BaseGrid[][] grids;
 
-    public Board(int width, int height) {
+    public BaseBoard(int width, int height) {
         this.width = width;
         this.height = height;
-        grids = new Grid[width][height];
+        grids = new BaseGrid[width][height];
     }
 
     public abstract void init();
 
-    public Grid getGrid(int x, int y) {
+    public BaseGrid getGrid(int x, int y) {
         return grids[x][y];
     }
 

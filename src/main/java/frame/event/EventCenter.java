@@ -1,5 +1,7 @@
 package frame.event;
 
+import frame.view.stage.GameStage;
+
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,12 +18,13 @@ public class EventCenter {
     }
 
     public static void subscribe(Class<? extends EventObject> eventClass, Consumer<EventObject> onNext) {
-        subscribe(eventClass, new Flow.Subscriber<EventObject>() {
+        subscribe(eventClass, new Flow.Subscriber<>() {
             Flow.Subscription subscription;
+
             @Override
             public void onSubscribe(Flow.Subscription subscription) {
                 this.subscription = subscription;
-                this.subscription.request(1);
+                this.subscription.request(2);
             }
 
             @Override
@@ -32,6 +35,7 @@ public class EventCenter {
 
             @Override
             public void onError(Throwable throwable) {
+                throwable.printStackTrace();
             }
 
             @Override
@@ -41,6 +45,7 @@ public class EventCenter {
     }
 
     public static void publish(EventObject event) {
-        eventTable.get(event.getClass()).submit(event);
+        if (eventTable.containsKey(event.getClass()))
+            eventTable.get(event.getClass()).submit(event);
     }
 }

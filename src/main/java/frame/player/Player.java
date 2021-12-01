@@ -1,28 +1,32 @@
 package frame.player;
 
+import frame.Game;
+import frame.action.SurrenderAction;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Player {
+public abstract class Player implements Serializable {
+
+    public static final long serialVersionUID = 1L;
+
     private final int id;
     private final String name;
     private boolean isReady;
-    protected final String type;
-    public static final Map<String, Class<?>> playerTypes = new HashMap<>();
+    protected final PlayerType type;
+    private boolean hasWin;
+    private boolean hasLose;
+    public boolean countInfo;
 
-    static {
-        addPlayerType("LOCAL", LocalPlayer.class);
-        addPlayerType("AI", AIPlayer.class);
-        addPlayerType("REMOTE", RemotePlayer.class);
-    }
-
-    public Player(int id, String name, String type) {
+    public Player(int id, String name, PlayerType type) {
         this.id = id;
         this.name = name;
         this.type = type;
     }
 
-    public void onNotify() {}
+    public void onNotify() {
+    }
 
     public int getId() {
         return id;
@@ -32,32 +36,59 @@ public abstract class Player {
         isReady = state;
     }
 
-    public boolean isReady() { return isReady; }
+    public boolean isReady() {
+        return isReady;
+    }
 
     public String getName() {
         return name;
     }
 
-    public String getType() {
+    public PlayerType getType() {
         return type;
     }
 
-    public static Player getPlayer(String type, int id, String name) {
-        Class<?> cls = playerTypes.get(type);
-        Player p = null;
-        try {
-             p = (Player) (cls.getDeclaredConstructor(int.class, String.class).newInstance(id, name));
-        } catch(Exception e) {
-            e.printStackTrace();
+    public void lose() {
+        hasLose = true;
+    }
+
+    public void win() {
+        hasWin = true;
+    }
+
+    public boolean isWin() {
+        return hasWin;
+    }
+
+    public boolean isLose() {
+        return hasLose;
+    }
+
+    public boolean isOut() {
+        return hasWin || hasLose;
+    }
+
+    public void revive() {
+        hasWin = false;
+        hasLose = false;
+    }
+
+    public void surrender() {
+        Game.performAction(new SurrenderAction(this));
+    }
+
+    protected static Player playerFactory(int id, String name, PlayerType type) {
+        Player res;
+        switch (type) {
+            case AI:
+                res = AIPlayer.getAIPlayer(id, name);
+                break;
+            case REMOTE:
+                res = new RemotePlayer(id, name);
+                break;
+            default:
+                res = new LocalPlayer(id, name);
         }
-        return p;
-    }
-
-    public static void addPlayerType(String type, Class<? extends Player> cls) {
-        playerTypes.put(type, cls);
-    }
-
-    public static void removePlayerType(String type) {
-        playerTypes.remove(type);
+        return res;
     }
 }

@@ -1,6 +1,8 @@
 package frame.view.stage;
 
 
+import frame.Game;
+import frame.socket.OnlineType;
 import frame.view.View;
 
 import javax.swing.*;
@@ -28,10 +30,18 @@ public class LoadStage extends BaseStage {
         for (int i = 0; i < slotNumber; i++) {
             JButton load = new JButton("Load " + (i+1));
             int finalI = i;
-            load.addActionListener((e) -> View.saver.load(String.format("/saves/save%d.sav", finalI +1)));
+            load.addActionListener((e) -> {
+                Game.loadGame(String.format("saves/save%d.sav", finalI + 1));
+                View.changeStage("GameStage");
+            });
             this.add(load);
             saveButtons[i] = load;
         }
+    }
+
+    @Override
+    public void exit() {
+        Game.setOnlineType(OnlineType.NONE);
     }
 
     public void setSlotNumber(int slotNumber) {
