@@ -23,6 +23,11 @@
 
 这里是所有文档的目录。
 
+### 开始
+
+[一些概念](Concepts.md)  
+[如何导入](import.md)
+
 ### 后端
 
 [一些基础知识](engine/Basic-Requirements.md)  
@@ -31,9 +36,17 @@
 [棋盘相关](engine/Board-Grid-and-Piece.md)  
 [玩家，玩家管理器，以及排行榜相关](engine/Player.md)  
 [存档](engine/Save-and-Saver.md)  
-[联网对战（未完成）](engine/Socket.md)  
 [工具](engine/Util.md)
 
 ### 前端
 
-[java swing](display/swing.md)
+[java swing](display/swing.md)  
+[Stage](display/Stage.md)  
+[前端的控制器](display/View.md)  
+[棋盘和格子的前端](display/Board.md)  
+#### 各种Stage：
+- [MenuStage](display/MenuStage.md)
+- [RoomStage](display/RoomStage.md)
+- [LoadStage](display/LoadStage.md)
+- [GameStage](display/GameStage.md)
+- [RankingStage](display/RankingStage.md)
