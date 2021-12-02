@@ -1,6 +1,5 @@
 package frame.player;
 
-import frame.Game;
 import frame.save.Saver;
 import frame.event.EventCenter;
 import frame.event.GameEndEvent;
@@ -11,16 +10,13 @@ import java.util.Collection;
 import java.util.Map;
 
 public class PlayerManager {
-    private static int playerRemained;
     private static Player[] players = new Player[2];
     private static int currentPlayer = 0;
     private static final Map<String, PlayerInfo> playerInfoMap;
 
     static {
         playerInfoMap = Saver.loadPlayerInfo();
-        EventCenter.subscribe(GameEndEvent.class, (e) -> {
-            updatePlayerInfo();
-        });
+        EventCenter.subscribe(GameEndEvent.class, (e) -> updatePlayerInfo());
     }
 
     public static void nextPlayer() {
@@ -68,7 +64,6 @@ public class PlayerManager {
     }
 
     public static int getCurrentPlayerIndex() {
-        if (Game.isClient()) return 0;
         return currentPlayer;
     }
 
@@ -118,24 +113,5 @@ public class PlayerManager {
             else playerInfoMap.get(player.getName()).addLoseCount();
         }
         Saver.savePlayerInfo(playerInfoMap);
-    }
-
-    public static int getNextRemotePlayerIndex() {
-        for (int i = 0; i < players.length; i++) {
-            if (players[i].type == PlayerType.REMOTE) return i;
-        }
-        return -1;
-    }
-
-    public static void updatePlayersFromServer(Player[] players, Map<String, PlayerInfo> remoteInfo) {
-        PlayerManager.players = players;
-        playerInfoMap.putAll(remoteInfo);
-        for (int i = 0; i < players.length; i++) {
-            EventCenter.publish(new PlayerChangeEvent(players[i], i));
-        }
-    }
-
-    public static Object[] getPlayersForServer() {
-        return new Object[]{players, playerInfoMap};
     }
 }

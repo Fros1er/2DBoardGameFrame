@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseGrid {
+public class BaseGrid {
     public final int x, y;
     public ActionFactory actionFactory;
     private BasePiece piece;

@@ -24,7 +24,6 @@ public class MineSweeperSolo {
 
         // ---------------Initialization--------------------------------
         View.window.setSize(600, 400);
-        View.setMusic(Objects.requireNonNull(MineSweeperSolo.class.getResource("")).toExternalForm());
         Game.setMaximumPlayer(1);
         View.disableStage("RoomStage", GameStage.instance());
 

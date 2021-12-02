@@ -4,8 +4,6 @@ import frame.Game;
 import frame.action.SurrenderAction;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class Player implements Serializable {
 
@@ -13,11 +11,9 @@ public abstract class Player implements Serializable {
 
     private final int id;
     private final String name;
-    private boolean isReady;
     protected final PlayerType type;
     private boolean hasWin;
     private boolean hasLose;
-    public boolean countInfo;
 
     public Player(int id, String name, PlayerType type) {
         this.id = id;
@@ -30,14 +26,6 @@ public abstract class Player implements Serializable {
 
     public int getId() {
         return id;
-    }
-
-    public void setReady(boolean state) {
-        isReady = state;
-    }
-
-    public boolean isReady() {
-        return isReady;
     }
 
     public String getName() {
@@ -79,15 +67,10 @@ public abstract class Player implements Serializable {
 
     protected static Player playerFactory(int id, String name, PlayerType type) {
         Player res;
-        switch (type) {
-            case AI:
-                res = AIPlayer.getAIPlayer(id, name);
-                break;
-            case REMOTE:
-                res = new RemotePlayer(id, name);
-                break;
-            default:
-                res = new LocalPlayer(id, name);
+        if (type == PlayerType.AI) {
+            res = AIPlayer.getAIPlayer(id, name);
+        } else {
+            res = new LocalPlayer(id, name);
         }
         return res;
     }

@@ -19,8 +19,6 @@ import java.util.function.Consumer;
 
 public class View {
 
-    public static String title = "";
-
     //static class
     private View() {
     }
@@ -29,10 +27,9 @@ public class View {
     public static final JFrame window = new JFrame();
     public static final CardLayout layout = new CardLayout();
     public static final JPanel sceneHolder = new JPanel(layout);
-//    public static MediaPlayer bgm = null;
 
     private static final Map<String, BaseStage> stages = new HashMap<>();
-    private static BaseStage currentStage = null;
+    private static BaseStage currentStage;
 
     public static GridViewFactory gridViewFactory;
     public static BoardViewFactory boardViewFactory;
@@ -52,16 +49,8 @@ public class View {
         addStage("RoomStage", RoomStage.instance());
         addStage("GameStage", GameStage.instance());
         addStage("RankingStage", RankingStage.instance());
-
-        layout.show(sceneHolder, "MenuStage");
         currentStage = MenuStage.instance();
 
-    }
-
-    public static void setName(String name) {
-        title = name;
-        MenuStage.instance().title.setText(name);
-        window.setTitle(name);
     }
 
     public static void addStage(String name, BaseStage stage) {
@@ -75,7 +64,8 @@ public class View {
 
     public static void changeStage(String name) {
         if (!stages.containsKey(name)) {
-            System.out.println("No stage found: " + name);
+            System.err.println("No stage found: " + name);
+            return;
         }
         currentStage.exit();
         currentStage = stages.get(name);
@@ -88,37 +78,12 @@ public class View {
         stages.put(name, jumpTo);
     }
 
-    public static void setMusic(String path) {
-        //bgm = new MediaPlayer(new Media(path));
-    }
-
     public static <T extends BaseGrid> void setGridViewPattern(GridViewFactory<T> factory) {
         gridViewFactory = factory;
     }
 
     public static void setBoardViewPattern(BoardViewFactory factory) {
         boardViewFactory = factory;
-    }
-
-    /**
-     * Add a JFrame to GameStage, using to import a demo or a completed game to frame.
-     */
-    public static void importFrame(JFrame frame) {
-        window.setJMenuBar(frame.getJMenuBar());
-        GameStage.instance().board.add(frame.getContentPane());
-        frame.dispose();
-    }
-
-    public static void start() {
-        MenuStage.instance().init();
-        LoadStage.instance().init();
-        RoomStage.instance().init();
-        GameStage.instance().init();
-        RankingStage.instance().init();
-
-        EventCenter.subscribe(PlayerWinEvent.class, (e) -> onPlayerWin.accept(((PlayerWinEvent) e).getPlayer()));
-        EventCenter.subscribe(PlayerLoseEvent.class, (e) -> onPlayerLose.accept(((PlayerLoseEvent) e).getPlayer()));
-        EventCenter.subscribe(GameEndEvent.class, (e) -> onGameEnd.invoke());
     }
 
     public static void setPlayerWinView(Consumer<Player> onPlayerWin) {
@@ -131,5 +96,24 @@ public class View {
 
     public static void setGameEndView(Procedure onGameEnd) {
         View.onGameEnd = onGameEnd;
+    }
+
+    public static void setName(String name) {
+        MenuStage.instance().title.setText(name);
+        window.setTitle(name);
+    }
+
+    public static void start() {
+        MenuStage.instance().init();
+        LoadStage.instance().init();
+        RoomStage.instance().init();
+        GameStage.instance().init();
+        RankingStage.instance().init();
+
+        layout.show(sceneHolder, "MenuStage");
+
+        EventCenter.subscribe(PlayerWinEvent.class, (e) -> onPlayerWin.accept(((PlayerWinEvent) e).getPlayer()));
+        EventCenter.subscribe(PlayerLoseEvent.class, (e) -> onPlayerLose.accept(((PlayerLoseEvent) e).getPlayer()));
+        EventCenter.subscribe(GameEndEvent.class, (e) -> onGameEnd.invoke());
     }
 }

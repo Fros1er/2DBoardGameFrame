@@ -11,12 +11,10 @@ import java.util.function.Function;
 
 public class SaveDialog {
 
-    private int selected = 0;
-
     public final JDialog dialog = new JDialog(View.window, "Select Slot", true);
     public final JLabel headLabel = new JLabel("Please select slot");
-    public static final JPanel[] slotPanels = new JPanel[3];
-    public static final JRadioButton[] radioButtons = new JRadioButton[3];
+    public static final JPanel[] slotPanels = new JPanel[Game.getSlotNumber()];
+    public static final JRadioButton[] radioButtons = new JRadioButton[Game.getSlotNumber()];
 
     public final JPanel buttonPanel = new JPanel();
     public final JButton confirmButton = new JButton("Save");
@@ -27,7 +25,7 @@ public class SaveDialog {
         dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
         dialog.add(headLabel);
         ButtonGroup group = new ButtonGroup();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < Game.getSlotNumber(); i++) {
             JPanel panel = new JPanel();
             JRadioButton select = new JRadioButton();
             radioButtons[i] = select;
@@ -69,9 +67,5 @@ public class SaveDialog {
         buttonPanel.add(cancelButton);
         buttonPanel.add(confirmButton);
         dialog.add(buttonPanel);
-    }
-
-    public int getSelected() {
-        return selected;
     }
 }

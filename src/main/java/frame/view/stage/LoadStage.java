@@ -2,50 +2,47 @@ package frame.view.stage;
 
 
 import frame.Game;
-import frame.socket.OnlineType;
 import frame.view.View;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class LoadStage extends BaseStage {
     private static volatile LoadStage sInstance = null;
 
     public JLabel title = new JLabel("LOAD");
     public final JButton back = new JButton("Back");
-
-    private int slotNumber = 3;
+    public Box buttonPanel = new Box(BoxLayout.Y_AXIS);
+    public JPanel dummyPanel = new JPanel();
     public JButton[] saveButtons;
 
     private LoadStage() {
         super("LoadStage");
-        this.add(title);
+        setLayout(new BorderLayout());
+        title.setFont(new Font("Arial", Font.PLAIN, 50));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
         back.addActionListener((e) -> View.changeStage("MenuStage"));
-        this.add(back);
     }
 
     @Override
     public void init() {
-        title.setText(View.title);
-        saveButtons = new JButton[slotNumber];
-        for (int i = 0; i < slotNumber; i++) {
+        this.add("North", title);
+        saveButtons = new JButton[Game.getSlotNumber()];
+        for (int i = 0; i < Game.getSlotNumber(); i++) {
             JButton load = new JButton("Load " + (i+1));
             int finalI = i;
             load.addActionListener((e) -> {
                 Game.loadGame(String.format("saves/save%d.sav", finalI + 1));
                 View.changeStage("GameStage");
             });
-            this.add(load);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(load);
             saveButtons[i] = load;
         }
-    }
-
-    @Override
-    public void exit() {
-        Game.setOnlineType(OnlineType.NONE);
-    }
-
-    public void setSlotNumber(int slotNumber) {
-        this.slotNumber = slotNumber;
+        buttonPanel.add(Box.createVerticalStrut(10));
+        buttonPanel.add(back);
+        dummyPanel.add(buttonPanel);
+        this.add(dummyPanel);
     }
 
     public static LoadStage instance() {

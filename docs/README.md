@@ -1,2 +1,39 @@
 # 文档
 
+## 注意事项
+
+如果我没写一个类的构造函数或者方法或者成员变量啥的，那就不要尝试去用。如果你发现一定要用，建议提问。我可能在文档漏掉了什么，或者有其他的办法，或者框架太拉了，做不到。
+
+**文档的很大一部分是说明书一样的东西，所以不用一次性看完，有需要的时候查阅对应的部分即可。善用页面内搜索功能。**
+
+## 如何使用 
+
+1. 本文档中所有能点的地方都可以跳转。
+2. 看完[一些基础知识](engine/Basic-Requirements.md)。
+3. 看完[一些概念](Concepts.md)
+4. 依照[如何导入]()提供的方法创建一个项目，导入框架。
+5. 搞个main函数出来。除了创建Board和Piece类（也许还有一些其他的小类，但不必要）的所有代码都是写到main函数里的。
+6. 打开example里的FIR.java作为参考
+7. 依据这个样例里的注释和样例代码本身写你自己的游戏。
+8. 你会发现里面有很多不知道用来干什么的方法。根据目录去找对应的方法，然后看一下（没必要看其他的）。
+9. 如果你需要干一些example里没有做过的事，看下面的目录。
+10. 如果你需要改ui，请参考[Stage](display/Stage.md)中“修改Stage里的界面“，和[概念](Concepts.md)中“框架里前端部分的一些概念”一节。
+
+## 目录
+
+这里是所有文档的目录。
+
+### 后端
+
+[一些基础知识](engine/Basic-Requirements.md)  
+[控制器](engine/Game.md)  
+[Action和Event](engine/Action-and-Event.md)  
+[棋盘相关](engine/Board-Grid-and-Piece.md)  
+[玩家，玩家管理器，以及排行榜相关](engine/Player.md)  
+[存档](engine/Save-and-Saver.md)  
+[联网对战（未完成）](engine/Socket.md)  
+[工具](engine/Util.md)
+
+### 前端
+
+[java swing](display/swing.md)

@@ -13,7 +13,6 @@ public abstract class AIPlayer extends Player {
 
     public AIPlayer(int id, String name, int delay) {
         super(id, name, PlayerType.AI);
-        setReady(true);
         this.delay = delay;
     }
 

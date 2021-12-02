@@ -1,6 +1,5 @@
 package frame.view.components;
 
-import frame.Game;
 import frame.event.EventCenter;
 import frame.event.PlayerChangeEvent;
 import frame.player.*;
@@ -21,8 +20,6 @@ public class RoomBlock extends JPanel {
     public Box playerInfo = new Box(1);
     public JLabel playerWinInfo = new JLabel();
     public JLabel playerLoseInfo = new JLabel();
-    public Box readyButtonBox = new Box(1);
-    public JButton readyButton = new JButton("Ready");
 
     public JComboBox<PlayerType> playerTypeSetter = new JComboBox<>();
     public JTextField playerNameSetter = new JTextField();
@@ -34,28 +31,11 @@ public class RoomBlock extends JPanel {
         setBorder(new EmptyBorder(10, 50, 10, 10));
         setLayout(new GridLayout());
 
-        ImageIcon icon;
-        switch (p.getType()) {
-            case AI:
-                icon = new ImageIcon("src/main/resources/icons/AI.png");
-                break;
-            case REMOTE:
-                icon = new ImageIcon("src/main/resources/icons/internet.png");
-                break;
-            default:
-                icon = new ImageIcon("src/main/resources/icons/person.png");
-        }
-        playerIcon.setIcon(icon);
-
         playerIcon.setLayout(new BoxLayout(playerIcon, BoxLayout.Y_AXIS));
         playerInfo.add(Box.createVerticalGlue());
         playerInfo.add(playerWinInfo);
         playerInfo.add(playerLoseInfo);
         playerInfo.add(Box.createVerticalGlue());
-
-        readyButtonBox.add(Box.createVerticalGlue());
-        readyButtonBox.add(readyButton);
-        readyButtonBox.add(Box.createVerticalGlue());
 
         playerTypeSetter.addItem(PlayerType.LOCAL);
         playerTypeSetter.addItem(PlayerType.AI);
@@ -83,25 +63,13 @@ public class RoomBlock extends JPanel {
             }
         });
 
-        readyButton.addActionListener((e) -> {
-            p.setReady(true);
-            readyButton.setEnabled(false);
-        });
-
         playerTypeSetter.addActionListener((e) -> {
-            switch ((PlayerType) Objects.requireNonNull(playerTypeSetter.getSelectedItem())) {
-                case LOCAL:
-                    playerNameSetter.setVisible(true);
-                    aiNameChooser.setVisible(false);
-                    break;
-                case REMOTE:
-                    playerNameSetter.setVisible(false);
-                    aiNameChooser.setVisible(false);
-                    break;
-                case AI:
-                    playerNameSetter.setVisible(false);
-                    aiNameChooser.setVisible(true);
-                    break;
+            if (Objects.requireNonNull(playerTypeSetter.getSelectedItem()) == PlayerType.LOCAL) {
+                playerNameSetter.setVisible(true);
+                aiNameChooser.setVisible(false);
+            } else {
+                playerNameSetter.setVisible(false);
+                aiNameChooser.setVisible(true);
             }
         });
 
@@ -113,16 +81,11 @@ public class RoomBlock extends JPanel {
         add(playerIcon);
         add(playerName);
         add(playerInfo);
-        add(readyButtonBox);
     }
 
     private void bindPlayer() {
         Player p = PlayerManager.getPlayer(id);
         playerName.setText(p.getName());
-        readyButton.setEnabled(true);
-        if (p.getType() == PlayerType.REMOTE) {
-            readyButton.setEnabled(false);
-        }
         PlayerInfo info = PlayerManager.getPlayerInfo(p.getName());
         if (!Objects.equals(info.getName(), "Waiting for player")) {
             playerWinInfo.setText("Win " + info.getWinCount());
@@ -131,15 +94,17 @@ public class RoomBlock extends JPanel {
             playerWinInfo.setText("");
             playerLoseInfo.setText("");
         }
+        ImageIcon icon;
+        if (p.getType() == PlayerType.AI) {
+            icon = new ImageIcon("src/main/resources/icons/AI.png");
+        } else {
+            icon = new ImageIcon("src/main/resources/icons/person.png");
+        }
+        playerIcon.setIcon(icon);
 
     }
 
     public void changePlayer() {
-        if (Game.isClient()) return;
-        playerTypeSetter.removeItem(PlayerType.REMOTE);
-        if (Game.isServer()) {
-            playerTypeSetter.addItem(PlayerType.REMOTE);
-        }
         int result = JOptionPane.showConfirmDialog(this, new JComponent[] {
                 playerTypeSetter,
                 new JLabel("Name: "),
@@ -148,15 +113,10 @@ public class RoomBlock extends JPanel {
         }, "Set player", JOptionPane.DEFAULT_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String name;
-            switch ((PlayerType) Objects.requireNonNull(playerTypeSetter.getSelectedItem())) {
-                case AI:
-                    name = (String) aiNameChooser.getSelectedItem();
-                    break;
-                case REMOTE:
-                    name = "Waiting for player";
-                    break;
-                default:
-                    name = playerNameSetter.getText();
+            if (Objects.requireNonNull(playerTypeSetter.getSelectedItem()) == PlayerType.AI) {
+                name = (String) aiNameChooser.getSelectedItem();
+            } else {
+                name = playerNameSetter.getText();
             }
             PlayerManager.setPlayer(id, (PlayerType) playerTypeSetter.getSelectedItem(), name);
         }

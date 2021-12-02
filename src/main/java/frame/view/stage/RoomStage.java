@@ -1,14 +1,12 @@
 package frame.view.stage;
 
 import frame.Game;
-import frame.socket.OnlineType;
 import frame.view.View;
 import frame.view.components.RoomBlock;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.event.ItemEvent;
 
 public class RoomStage extends BaseStage {
     private static volatile RoomStage sInstance = null;
@@ -20,7 +18,6 @@ public class RoomStage extends BaseStage {
     public RoomBlock[] roomBlocks = null;
     public final JButton back = new JButton("Back");
     public final JButton start = new JButton("Start");
-    public final JCheckBox online = new JCheckBox("Allow LAN");
     public final JTextField textWidth = new JTextField(4);
     public final JTextField textHeight = new JTextField(4);
 
@@ -32,9 +29,6 @@ public class RoomStage extends BaseStage {
     private RoomStage() {
         super("RoomStage");
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        online.addItemListener((e) ->
-                Game.setOnlineType((e.getStateChange() == ItemEvent.SELECTED) ? OnlineType.SERVER : OnlineType.NONE));
         back.addActionListener((e) -> View.changeStage("MenuStage"));
         start.addActionListener((e) -> View.changeStage("GameStage"));
 
@@ -59,7 +53,6 @@ public class RoomStage extends BaseStage {
 
         settingsRow.add(textWidth);
         settingsRow.add(textHeight);
-        settingsRow.add(online);
         buttonRows.add(back);
         buttonRows.add(start);
         playerRows.setLayout(new BoxLayout(playerRows, BoxLayout.Y_AXIS));

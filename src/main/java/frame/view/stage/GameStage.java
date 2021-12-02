@@ -1,7 +1,6 @@
 package frame.view.stage;
 
 import frame.Game;
-import frame.action.ActionFactory;
 import frame.board.BaseGrid;
 import frame.board.BaseBoard;
 import frame.event.EventCenter;
@@ -36,35 +35,33 @@ public class GameStage extends BaseStage {
 
     private GameStage() {
         super("GameStage");
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
+
+        menuButton.addActionListener((e) -> View.changeStage("MenuStage"));
+        undoButton.addActionListener((e) -> Game.cancelLastAction());
+        saveButton.addActionListener((e) -> saveDialog.dialog.setVisible(true));
+        saveDialog.dialog.setLocationRelativeTo(this);
     }
 
     @Override
     public void init() {
-        menuButton.addActionListener((e) -> View.changeStage("MenuStage"));
-        undoButton.addActionListener((e) -> Game.cancelLastAction());
-        saveButton.addActionListener((e) -> {
-            saveDialog.dialog.setVisible(true);
-        });
-
-        saveDialog.dialog.setLocationRelativeTo(this);
-
         menuBar.add(menuButton);
         menuBar.add(saveButton);
         menuBar.add(undoButton);
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public void enter() {
         Game.init();
         grids.clear();
 
         this.removeAll();
-        this.add(menuBar);
+        this.add("North", menuBar);
         this.board = View.boardViewFactory.createBoardView();
         this.add(this.board);
-        this.add(scoreBoard);
+        this.add("South", scoreBoard);
 
         BaseBoard board = Game.getBoard();
         GridBagConstraints gbc = new GridBagConstraints();

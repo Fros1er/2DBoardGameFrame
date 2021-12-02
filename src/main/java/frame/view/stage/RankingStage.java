@@ -9,7 +9,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.Comparator;
-import java.util.Map;
 
 public class RankingStage extends BaseStage {
     private static volatile RankingStage sInstance = null;
@@ -24,12 +23,7 @@ public class RankingStage extends BaseStage {
     private RankingStage() {
         super("RankingStage");
         setLayout(new BorderLayout());
-        titlePanel.add(title);
-        buttonPanel.add(back);
-        add("North", titlePanel);
-        add("South", buttonPanel);
         back.addActionListener((e) -> View.changeStage("MenuStage"));
-
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Name");
         model.addColumn("Win");
@@ -42,6 +36,15 @@ public class RankingStage extends BaseStage {
         for (int i = 0; i < 3; i++) {
             rankingTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
+
+    }
+
+    @Override
+    public void init() {
+        titlePanel.add(title);
+        buttonPanel.add(back);
+        add("North", titlePanel);
+        add("South", buttonPanel);
         add(rankingPanel);
     }
 
@@ -49,10 +52,7 @@ public class RankingStage extends BaseStage {
     public void enter() {
         PlayerManager.getAllPlayersInfo().stream()
                 .sorted(Comparator.comparingInt(PlayerInfo::getWinCount))
-                .forEach((p) -> {
-                    System.out.println(p);
-                    ((DefaultTableModel) rankingTable.getModel()).addRow(new Object[]{p.getName(), p.getWinCount(), p.getLoseCount()});
-                });
+                .forEach((p) -> ((DefaultTableModel) rankingTable.getModel()).addRow(new Object[]{p.getName(), p.getWinCount(), p.getLoseCount()}));
     }
 
     public static RankingStage instance() {

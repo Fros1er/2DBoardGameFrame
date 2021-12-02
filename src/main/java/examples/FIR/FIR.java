@@ -2,6 +2,7 @@ package examples.FIR;
 
 import frame.Game;
 import frame.action.Action;
+import frame.board.BaseGrid;
 import frame.player.AIPlayer;
 import frame.view.View;
 import frame.view.board.BoardView;
@@ -9,7 +10,6 @@ import frame.view.board.GridPanelView;
 import frame.view.stage.GameStage;
 
 import javax.swing.*;
-import java.util.Objects;
 import java.util.Random;
 
 import static java.lang.Math.abs;
@@ -27,24 +27,21 @@ public class FIR {
 
         // 1. 游戏的一些杂项设置
         View.window.setSize(600, 400); // 初始窗口大小
-        View.setMusic(Objects.requireNonNull(FIR.class.getResource("")).toExternalForm()); // 音乐
         Game.setMaximumPlayer(2); // 最大玩家数
         View.setName("FIR"); //标题栏
         Game.setBoardSize(10, 10);
 
         // 2.注册棋盘
         /*
-         * 有小道消息说你们是黑白棋，正好框架现在也不支持把棋子下在线上，那就凑合一下（
          * 具体的看代码
          * 下面跳到Board.java
          */
         Game.registerBoard(Board.class);
 
         // 3.注册事件
-        // 事件是什么去看文档，这里应该只讲解样例
+        // 事件是什么去看文档里对这个函数的讲解，这里只讲解样例
 
         Game.registerGridAction((x, y) -> true, (x, y, mouseButton) -> {
-            // 这里的lambda表达式如果不写类型名的话IDEA只会把grid认成BaseGrid类
             // 那个 (x, y) -> true代表对每个格子都注册事件
             // 数字的含义看文档
 
@@ -54,7 +51,7 @@ public class FIR {
                     // 如果开着作弊模式就不结束回合，并且下的棋子颜色由下拉菜单选中的颜色决定
                     @Override
                     public boolean perform() {
-                        Grid grid = (Grid) Game.getBoard().getGrid(x, y);
+                        BaseGrid grid = Game.getBoard().getGrid(x, y);
                         if (grid.hasPiece()) return false; // 棋不能下在已经有棋的格子上
                         // 往格子上丢一个新棋子，颜色。。。0是黑1是白，有点不太优雅但我暂时没有更好的办法
                         // getCurrentPlayerIndex代表当前是第几个玩家，这里是直接拿这个index去碰枚举类里Color的顺序了
@@ -63,7 +60,6 @@ public class FIR {
                         } else {
                             grid.setOwnedPiece(new Piece(Color.values()[Game.getCurrentPlayerIndex()]));
                         }
-                        // setOwnedPiece有个返回值，所以这三行可以合并
                         lastChangedX = x;
                         lastChangedY = y; //看下一条
                         return true;
@@ -71,12 +67,12 @@ public class FIR {
 
                     @Override
                     public void undo() { // 撤销
-                        Grid grid = (Grid) Game.getBoard().getGrid(x, y);
+                        BaseGrid grid = Game.getBoard().getGrid(x, y);
                         grid.removeOwnedPiece();
                     }
                 };
             }
-            return null; // 如果你在检查之后发现你不需要这个按键就返回null
+            return null; // 如果你在检查之后发现你不需要这个按键（玩家不做出Action）就返回null
         });
 
         // 4.判断游戏的输赢
@@ -92,6 +88,9 @@ public class FIR {
                 // 上一行getOwnedPiece拿到的是BasePiece类，所以你需要强制类型转换。。。
                 if (piece == null) return false;
                 Color color = piece.getColor();
+                //下一行意思是如果刚下的棋子颜色color在Color枚举里的位置和玩家的id不一样，则这个玩家肯定没赢
+                //比如刚下的是白棋，那么下黑棋的玩家肯定不能赢。
+                if (color.ordinal() != player.getId()) return false;
                 for (int j = 1; j < 5; j++) {
                     int x = lastChangedX + directions[i][0] * j, y = lastChangedY + directions[i][1] * j;
                     if (x < 0 || x >= Game.getWidth() || y < 0 || y >= Game.getHeight()) {
@@ -104,15 +103,8 @@ public class FIR {
                         break;
                     }
                 }
-                if (flag) return true; //有一个连成五个就返回
+                if (flag) return true; //有一个连成五个就返回true
             }
-            return false;
-        }));
-
-        // 注意，这里判断的是当前回合玩家（在五子棋是里当前落子的玩家）的输赢
-        // 所以很显然五子棋里不可能自己下一步棋然后暴毙了
-        // 所以return false就完了
-        Game.setPlayerLosingJudge((player -> {
             return false;
         }));
 
@@ -137,6 +129,7 @@ public class FIR {
         // AI是一定要有的，不然选择玩家那个界面会有个空的选择AI玩家的框，就非常尴尬
         // 你懒得写直接让这个方法return false（让AI上来就投降）也不是不行。。。
         // French AI（1/1)
+        // 这个在文档的“玩家，玩家管理器，以及排行榜相关”里
         AIPlayer.addAIType("Random", (id) -> {
             return new AIPlayer(id, "Random", 200) {
                 @Override
@@ -153,16 +146,12 @@ public class FIR {
         });
 
         // 6.注册棋盘和格子的样式
-        // TODO: 修改棋盘样式
         View.setBoardViewPattern(() -> {
-            return new BoardView() {
-                @Override
-                public void redraw() {}
-            };
+            return new BoardView();
         });
 
         //格子的样式
-        View.setGridViewPattern((Grid grid) -> { //这个lambda参数也要写类型名
+        View.setGridViewPattern((grid) -> {
             return new GridPanelView() {
                 // 有两种GridView，看文档
                 @Override
@@ -191,11 +180,6 @@ public class FIR {
         }));
         // 由于是实际游戏中弹的框，所以Dialog的parent是GameStage(确信
         // 当然无脑设成View.window也可以
-
-        // 和上面的上面一样的原因，这里不需要
-//        View.setPlayerLoseView((player -> {
-//
-//        }));
 
         // 游戏结束时的视觉效果
         // 注意这是整场游戏结束，我的设想是用来做一些跳转或者显示返回主菜单按钮的
