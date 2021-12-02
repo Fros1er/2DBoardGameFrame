@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>CS102Aprojectframe</artifactId>
+    <artifactId>2DBoardGameFrame</artifactId>
     <version>1.0-SNAPSHOT</version>
     <properties>
         <maven.compiler.release>9</maven.compiler.release>
