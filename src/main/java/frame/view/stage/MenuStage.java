@@ -33,24 +33,28 @@ public class MenuStage extends BaseStage {
         rank.addActionListener((e) -> View.changeStage("RankingStage"));
         settings.addActionListener((e) -> View.changeStage("SettingStage"));
         quit.addActionListener((e) -> View.window.dispose());
+
+        drawComponents = () -> {
+            this.add(dummyPanel);
+            this.add("North", title);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(newGame);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(load);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(rank);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(settings);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(quit);
+            buttonPanel.add(Box.createVerticalGlue());
+            dummyPanel.add(buttonPanel);
+        };
     }
 
     @Override
     public void init() {
-        this.add("North", title);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(newGame);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(load);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(rank);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(settings);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(quit);
-        buttonPanel.add(Box.createVerticalGlue());
-        dummyPanel.add(buttonPanel);
-        this.add(dummyPanel);
+        super.init();
         revalidate();
         repaint();
     }

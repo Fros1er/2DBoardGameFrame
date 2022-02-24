@@ -99,16 +99,12 @@ public class View {
     }
 
     public static void setName(String name) {
-        MenuStage.instance().title.setText(name);
+        ((MenuStage) getStage("MenuStage")).title.setText(name);
         window.setTitle(name);
     }
 
     public static void start() {
-        MenuStage.instance().init();
-        LoadStage.instance().init();
-        RoomStage.instance().init();
-        GameStage.instance().init();
-        RankingStage.instance().init();
+        stages.values().forEach(BaseStage::init);
 
         layout.show(sceneHolder, "MenuStage");
 

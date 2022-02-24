@@ -19,7 +19,6 @@ public class Saver {
     }
 
     public static void save(Save save, String path) {
-
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path));
             out.writeObject(save);

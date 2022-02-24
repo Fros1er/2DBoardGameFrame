@@ -51,19 +51,22 @@ public class RoomStage extends BaseStage {
         textWidth.getDocument().addDocumentListener(sizeListener);
         textHeight.getDocument().addDocumentListener(sizeListener);
 
-        settingsRow.add(textWidth);
-        settingsRow.add(textHeight);
-        buttonRows.add(back);
-        buttonRows.add(start);
         playerRows.setLayout(new BoxLayout(playerRows, BoxLayout.Y_AXIS));
 
-        this.add(settingsRow);
-        this.add(playerRows);
-        this.add(buttonRows);
+        drawComponents = () -> {
+            this.add(settingsRow);
+            this.add(playerRows);
+            this.add(buttonRows);
+            settingsRow.add(textWidth);
+            settingsRow.add(textHeight);
+            buttonRows.add(back);
+            buttonRows.add(start);
+        };
     }
 
     @Override
     public void init() {
+        super.init();
         textWidth.setText(String.valueOf(Game.getWidth()));
         textHeight.setText(String.valueOf(Game.getHeight()));
         roomBlocks = new RoomBlock[Game.getMaximumPlayerNumber()];

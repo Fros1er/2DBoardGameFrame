@@ -9,6 +9,7 @@ import frame.event.EventCenter;
 import frame.view.View;
 import frame.view.board.BoardView;
 import frame.view.board.GridButtonView;
+import frame.view.board.GridPanelView;
 import frame.view.stage.GameStage;
 
 import javax.swing.*;
@@ -22,46 +23,46 @@ public class MineSweeperSolo {
 
     public static void main(String[] args) {
 
+        // This example is not working well.
+        // Example FIR is recommended.
+
         // ---------------Initialization--------------------------------
         View.window.setSize(600, 400);
         Game.setMaximumPlayer(1);
-        View.disableStage("RoomStage", GameStage.instance());
+        View.setName("Minesweeper");
+        Game.setBoardSize(10, 10);
 
         // ---------------Make Board-------------------------------------
         Game.registerBoard(Board.class);
 
         //-------------------Set View Of Board--------------------------
-        View.setBoardViewPattern(() -> {
-            return new BoardView() {
-                @Override
-                public void redraw() {
-                }
-            };
+        View.setBoardViewPattern(() -> new BoardView() {
+            @Override
+            public void redraw() {
+            }
         });
 
-        View.setGridViewPattern((myBaseGrid grid) -> {
-            return new GridButtonView() {
-                @Override
-                public void init() {
+        View.setGridViewPattern((myBaseGrid grid) -> new GridPanelView() {
+            @Override
+            public void init() {
 
-                }
+            }
 
-                @Override
-                public void redraw() {
-                    if (grid.isOpen) {
-                        this.setEnabled(false);
-                        if (grid.hasMine) {
-                            this.setText("M");
-                        } else {
-                            this.setText(String.valueOf(grid.getNumber()));
-                        }
+            @Override
+            public void redraw() {
+                if (grid.isOpen) {
+//                    this.setEnabled(false);
+                    if (grid.hasMine) {
+                        this.label.setText("M");
                     } else {
-                        this.setEnabled(true);
-                        if (grid.hasFlag) this.setText("F");
-                        else this.setText("");
+                        this.label.setText(String.valueOf(grid.getNumber()));
                     }
+                } else {
+//                    this.setEnabled(true);
+                    if (grid.hasFlag) this.label.setText("F");
+                    else this.label.setText("");
                 }
-            };
+            }
         });
 
         // ---------------Register Actions-------------------------------
@@ -174,7 +175,7 @@ public class MineSweeperSolo {
         backButton.addActionListener(e -> View.changeStage("MenuStage"));
         GameStage.instance().menuBar.add(backButton);
 
-        View.setName("Minesweeper");
+
         View.start();
     }
 

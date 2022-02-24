@@ -8,6 +8,7 @@ import frame.view.View;
 import frame.view.board.BoardView;
 import frame.view.board.GridPanelView;
 import frame.view.stage.GameStage;
+import frame.view.stage.MenuStage;
 
 import javax.swing.*;
 import java.util.Random;
@@ -146,11 +147,29 @@ public class FIR {
         });
 
         // 6.注册棋盘和格子的样式
+        // 棋盘和格子的样式比较特殊，需要单独在这里改
+        // 其他的详见这个文件最下面的注释
+        // 我这里没有改样式
+        // 这里是只针对棋盘本身的（即所有格子包含的区域）。init会在进入GameStage时执行，redraw是格子有变动时
+        // 我没想到有啥用（可能改背景？
+        // 总之留空在这里
         View.setBoardViewPattern(() -> {
-            return new BoardView();
+            return new BoardView() {
+                @Override
+                public void init() {
+
+                }
+
+                @Override
+                public void redraw() {
+
+                }
+            };
         });
 
         //格子的样式
+        //画棋子是在这里的
+        //也可以用来设边框
         View.setGridViewPattern((grid) -> {
             return new GridPanelView() {
                 // 有两种GridView，看文档
@@ -188,7 +207,7 @@ public class FIR {
         });
 
         // 8. 自定义菜单栏
-        // 看文档，stage里留了一些panel，有需求的话自己往里装
+        // 看文档，所有stage里都留了一些panel，有需求的话自己往里装
         JLabel cheatText = new JLabel("Cheat mode");
         JCheckBox cheat = new JCheckBox();
         JComboBox<Color> cheatColor = new JComboBox<>();
@@ -203,11 +222,46 @@ public class FIR {
             cheatingColor = (Color) cheatColor.getSelectedItem();
         });
 
+        // 10.自定义界面
+        // 先跳过这段注释往下看，有需要再回来
+        // 重复一遍：Stage中所有的Component（包括那些Panel）会在上面的View.start()中添加到Stage或它的父组件中。
+        // 具体怎么添加可以在这里写个lambda自定义。
+        // 但是，自定义会完全覆盖掉默认的添加方式，所以你大概需要把原来的复制出来（在Stage构造函数最下面有个drawComponents = () -> {}），
+        // 在这个基础上改。
+        // 因为这里面没有this，所以还需要手动获取一下。。总之就非常麻烦，但我没有更好的写法了
+        /*
+        MenuStage.instance().setCustomDrawMethod(() -> {
+            MenuStage stage = MenuStage.instance();
+            stage.add(stage.dummyPanel);
+            stage.add("North", stage.title);
+            Box buttonPanel = stage.buttonPanel;
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(stage.newGame);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(stage.load);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(stage.rank);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(stage.settings);
+            buttonPanel.add(Box.createVerticalStrut(10));
+            buttonPanel.add(stage.quit);
+            buttonPanel.add(Box.createVerticalGlue());
+            stage.dummyPanel.add(buttonPanel);
+        });
+        */
+
+
         // 9.开始游戏！
         // 一定要有这一行，里面做了一堆初始化
         View.start();
 
-        //GameStage的菜单栏是在start被执行后创建的，所以如果你想在菜单栏默认按钮后面加，就在start执行后再add你的Component
+        // 10.自定义界面
+        // 所有Stage中的JPanel是初始创建好的，具体有哪些可用的Panel看代码或者文档。你也可以往里加新的Panel。
+        // Stage中所有的Component（包括那些Panel）会在上面的View.start()中添加到Stage或它的父组件中。
+        // 所以，如果想要在初始样式中某一Panel的所有Component之前（或之后）追加新的Component，在View.start()前（或后）直接add即可
+        // 比如像下面这样
+        // 要简单更改现有组件的样式（背景图片等）的话，随便写在哪都行
+        // 如果对顺序有要求，或需要修改初始样式包含的Panel的layout的话，需要在View.start()之前调用setCustomLayout函数。具体看上面。
         GameStage.instance().menuBar.add(cheatText);
         GameStage.instance().menuBar.add(cheat);
         GameStage.instance().menuBar.add(cheatColor);

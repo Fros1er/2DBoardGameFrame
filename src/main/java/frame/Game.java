@@ -11,6 +11,7 @@ import frame.save.Saver;
 import frame.event.*;
 import frame.player.Player;
 import frame.util.Procedure;
+import frame.view.View;
 import frame.view.stage.GameStage;
 
 import java.lang.reflect.Constructor;
@@ -27,9 +28,12 @@ public class Game {
     private static Predicate<Player> playerWinningJudge;
     private static Predicate<Player> playerLosingJudge = (player) -> false;
     private static BooleanSupplier gameEndingJudge = PlayerManager::isOnePlayerWin;
-    private static Procedure gameEndFunction = () -> {};
-    private static Procedure initFunction = () -> {};
-    private static Procedure gridActionRegister = () -> {};
+    private static Procedure gameEndFunction = () -> {
+    };
+    private static Procedure initFunction = () -> {
+    };
+    private static Procedure gridActionRegister = () -> {
+    };
     private static int width;
     private static int height;
     private static Save fromSave = null;
@@ -37,7 +41,8 @@ public class Game {
 
     public static final Object controllerSource = new Object();
 
-    private Game() {}
+    private Game() {
+    }
 
     // properties
 
@@ -137,6 +142,7 @@ public class Game {
     }
 
     public static void loadGame(String path) {
+        System.out.println(path);
         fromSave = Saver.load(path);
         assert fromSave != null;
         setBoardSize(fromSave.width, fromSave.height);
@@ -156,6 +162,7 @@ public class Game {
         initFunction.invoke();
         if (fromSave != null) {
             Thread t = new Thread(() -> {
+                ((GameStage) View.getStage("GameStage")).disableMouseClick();
                 for (Action action : fromSave.actionStack) {
                     try {
                         Thread.sleep(200);
@@ -164,12 +171,13 @@ public class Game {
                     }
                     performAction(action);
                 }
+                ((GameStage) View.getStage("GameStage")).enableMouseClick();
             });
             t.start();
         } else {
             PlayerManager.getCurrentPlayer().onNotify();
         }
-        EventCenter.publish(new BoardChangeEvent(GameStage.instance()));
+        EventCenter.publish(new BoardChangeEvent(View.getStage("GameStage")));
     }
 
     public static boolean performAction(Action action) {

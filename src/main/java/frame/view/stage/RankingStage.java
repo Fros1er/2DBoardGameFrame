@@ -37,15 +37,13 @@ public class RankingStage extends BaseStage {
             rankingTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
-    }
-
-    @Override
-    public void init() {
-        titlePanel.add(title);
-        buttonPanel.add(back);
-        add("North", titlePanel);
-        add("South", buttonPanel);
-        add(rankingPanel);
+        drawComponents = () -> {
+            this.add("North", titlePanel);
+            this.add("South", buttonPanel);
+            this.add(rankingPanel);
+            titlePanel.add(title);
+            buttonPanel.add(back);
+        };
     }
 
     @Override

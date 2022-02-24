@@ -57,7 +57,7 @@ public class SaveDialog {
         confirmButton.addActionListener((e) -> {
             for (int i = 0; i < radioButtons.length; i++) {
                 if (radioButtons[i].isSelected()) {
-                    Game.saveGame(String.format("./save%d.sav", i + 1));
+                    Game.saveGame(String.format("./saves/save%d.sav", i + 1));
                     break;
                 }
             }

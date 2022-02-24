@@ -22,27 +22,25 @@ public class LoadStage extends BaseStage {
         title.setFont(new Font("Arial", Font.PLAIN, 50));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         back.addActionListener((e) -> View.changeStage("MenuStage"));
-    }
-
-    @Override
-    public void init() {
-        this.add("North", title);
-        saveButtons = new JButton[Game.getSlotNumber()];
-        for (int i = 0; i < Game.getSlotNumber(); i++) {
-            JButton load = new JButton("Load " + (i+1));
-            int finalI = i;
-            load.addActionListener((e) -> {
-                Game.loadGame(String.format("saves/save%d.sav", finalI + 1));
-                View.changeStage("GameStage");
-            });
+        drawComponents = () -> {
+            this.add(dummyPanel);
+            this.add("North", title);
+            saveButtons = new JButton[Game.getSlotNumber()];
+            for (int i = 0; i < Game.getSlotNumber(); i++) {
+                JButton load = new JButton("Load " + (i+1));
+                int finalI = i;
+                load.addActionListener((e) -> {
+                    Game.loadGame(String.format("saves/save%d.sav", finalI + 1));
+                    View.changeStage("GameStage");
+                });
+                buttonPanel.add(Box.createVerticalStrut(10));
+                buttonPanel.add(load);
+                saveButtons[i] = load;
+            }
             buttonPanel.add(Box.createVerticalStrut(10));
-            buttonPanel.add(load);
-            saveButtons[i] = load;
-        }
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(back);
-        dummyPanel.add(buttonPanel);
-        this.add(dummyPanel);
+            buttonPanel.add(back);
+            dummyPanel.add(buttonPanel);
+        };
     }
 
     public static LoadStage instance() {

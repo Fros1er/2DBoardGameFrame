@@ -32,6 +32,15 @@ public class GameStage extends BaseStage {
 
     public final ArrayList<GridView> grids = new ArrayList<>();
 
+    private boolean enableClick = true;
+
+    public void disableMouseClick() {
+         enableClick = false;
+    }
+
+    public void enableMouseClick() {
+         enableClick = true;
+    }
 
     private GameStage() {
         super("GameStage");
@@ -41,13 +50,14 @@ public class GameStage extends BaseStage {
         undoButton.addActionListener((e) -> Game.cancelLastAction());
         saveButton.addActionListener((e) -> saveDialog.dialog.setVisible(true));
         saveDialog.dialog.setLocationRelativeTo(this);
-    }
 
-    @Override
-    public void init() {
-        menuBar.add(menuButton);
-        menuBar.add(saveButton);
-        menuBar.add(undoButton);
+        drawComponents = () -> {
+            menuBar.add(menuButton);
+            menuBar.add(saveButton);
+            menuBar.add(undoButton);
+            this.add("North", menuBar);
+            this.add("South", scoreBoard);
+        };
     }
 
 
@@ -57,11 +67,10 @@ public class GameStage extends BaseStage {
         Game.init();
         grids.clear();
 
-        this.removeAll();
-        this.add("North", menuBar);
+        if (this.board != null)
+            this.remove(this.board);
         this.board = View.boardViewFactory.createBoardView();
         this.add(this.board);
-        this.add("South", scoreBoard);
 
         BaseBoard board = Game.getBoard();
         GridBagConstraints gbc = new GridBagConstraints();
@@ -85,7 +94,7 @@ public class GameStage extends BaseStage {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         super.mouseReleased(e);
-                        if (pressed && Game.getCurrentPlayer().getType() == PlayerType.LOCAL) {
+                        if (enableClick && pressed && Game.getCurrentPlayer().getType() == PlayerType.LOCAL) {
                             Game.performAction(baseGrid.actionFactory.createAction(finalI, finalJ, e.getButton()));
                         }
                         pressed = false;

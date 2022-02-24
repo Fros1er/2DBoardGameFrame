@@ -3,6 +3,7 @@ package frame.view.components;
 import frame.event.EventCenter;
 import frame.event.PlayerChangeEvent;
 import frame.player.*;
+import frame.util.Procedure;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,10 +11,21 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class RoomBlock extends JPanel {
 
     public final int id;
+    protected static Consumer<RoomBlock> drawComponents = (RoomBlock roomBlock) -> {
+        roomBlock.playerInfo.add(Box.createVerticalGlue());
+        roomBlock.playerInfo.add(roomBlock.playerWinInfo);
+        roomBlock.playerInfo.add(roomBlock.playerLoseInfo);
+        roomBlock.playerInfo.add(Box.createVerticalGlue());
+
+        roomBlock.add(roomBlock.playerIcon);
+        roomBlock.add(roomBlock.playerName);
+        roomBlock.add(roomBlock.playerInfo);
+    };
 
     public JLabel playerIcon = new JLabel();
     public JLabel playerName = new JLabel();
@@ -27,15 +39,10 @@ public class RoomBlock extends JPanel {
 
     public RoomBlock(int id) {
         this.id = id;
-        Player p = PlayerManager.getPlayer(id);
         setBorder(new EmptyBorder(10, 50, 10, 10));
         setLayout(new GridLayout());
 
         playerIcon.setLayout(new BoxLayout(playerIcon, BoxLayout.Y_AXIS));
-        playerInfo.add(Box.createVerticalGlue());
-        playerInfo.add(playerWinInfo);
-        playerInfo.add(playerLoseInfo);
-        playerInfo.add(Box.createVerticalGlue());
 
         playerTypeSetter.addItem(PlayerType.LOCAL);
         playerTypeSetter.addItem(PlayerType.AI);
@@ -78,12 +85,10 @@ public class RoomBlock extends JPanel {
             if (((PlayerChangeEvent) e).id == this.id) bindPlayer();
         });
 
-        add(playerIcon);
-        add(playerName);
-        add(playerInfo);
+        drawComponents.accept(this);
     }
 
-    private void bindPlayer() {
+    public void bindPlayer() {
         Player p = PlayerManager.getPlayer(id);
         playerName.setText(p.getName());
         PlayerInfo info = PlayerManager.getPlayerInfo(p.getName());
