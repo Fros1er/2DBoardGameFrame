@@ -46,7 +46,7 @@ endTurn代表玩家在成功执行这个action之后会结束自己的回合。
 ### Action不推荐使用的方法
 
 `getChangedPlayer();`和`setChangedPlayer();`。  
-这是框架自己会用的函数，用于记录Action调用后有没有玩家出局。手动调用可能会导致撤销上一步出现错误。
+这是框架自己会用的函数，用于记录Action调用后有没有玩家出局。手动调用可能会导致撤销出现错误。
 
 ## Event
 
@@ -72,25 +72,26 @@ EventCenter.subscribe(BoardChangeEvent.class, (e) -> {
 
 `EventCenter.publish(EventObject);`  
 发布一个事件。函数里面传一个继承EventObject的对象。  
-继承EventObject的对象里面可以放一些成员变量，所以可以方便的把参数在全局传来传去。
+继承EventObject的对象里面可以放一些成员变量（但subscribe的lambda里传入的变量是EventObject基类，通过这个传递变量的话需要强制类型转换），所以可以方便的把参数在全局传来传去。
 
 除非你确定内置Event的含义（见下文），否则不要手动触发内置的Event，否则会有各种奇怪的bug。
 
 ### 各种内置Event
 
-每个Event里面的参数可以用idea跳进去看。不在这说了。
+每个Event里面的参数可以用idea跳进去看。不在这说了。  
+下面说的触发是框架默认内置的行为。你可以通过上面说的订阅添加新的行为。
 
 `BoardChangeEvent`  
-在任意Action被执行或撤销时触发。触发后会调用棋盘和所有格子的redraw方法。
+在第一次进入游戏，任意Action被执行或撤销时触发。触发后会调用棋盘和所有格子的redraw方法。
 
-`GameEndEvent`
+`GameEndEvent`  
 一局游戏结束时触发。触发后会更新玩家排行榜的信息，并且调用View里注册的onGameEnd方法。
 
-`PlayerWinEvent`
+`PlayerWinEvent`  
 有玩家胜利时触发。触发后会调用View里注册的onPlayerWin方法。
 
-`PlayerLoseEvent`
+`PlayerLoseEvent`  
 有玩家胜利时触发。触发后会调用View里注册的onPlayerLose方法。
 
-`PlayerChangeEvent`
+`PlayerChangeEvent`  
 在RoomStage里有玩家姓名或者类型发生变化的时候触发。触发后更新RoomStage里玩家显示，以及如果开启联网对战的话也会更新其他客户端的玩家显示。

@@ -8,7 +8,7 @@
 
 当处于一个Stage时，该Stage上的组件会显示，而其他的Stage会隐藏。这是通过CardLayout实现的。
 
-Stage本身是单例，也勉强算一个有限状态机，详见[一些基础知识](../engine/Basic-Requirements.md)。
+Stage本身是单例，详见[一些基础知识](../engine/Basic-Requirements.md)。
 
 View里提供了一些方法来在Stage之间切换，禁用某一个Stage，或者新增Stage。
 
@@ -22,14 +22,13 @@ View里提供了一些方法来在Stage之间切换，禁用某一个Stage，或
 
 # Stage中组件的渲染过程
 Stage中所有的Component会在构造函数中创建完毕，并设置好有关的样式。由于Stage是个单例，所以你可以认为这些东西在你所有自己的代码之前就弄好了。  
-接下来是View.start()。这里会调用xxxStage.init()把所有的Component添加进Stage或它的父组件（但父组件也在Stage里，这个没问题。  
-然后除了棋盘会在进入GameStage的时候动态绘制，就没了。
-
-
+接下来是View.start()。这里会调用xxxStage.init()把所有的Component添加进Stage或它的父组件（父组件也在Stage里）。  
+唯一的例外是棋盘会在进入GameStage的时候动态绘制。
 
 ## 修改Stage里的界面
 
-每一个内建的Stage对应的文档里会说明Stage本身的布局（Stage自己就是个JPanel），和Stage里所有添加的组件。所有的组件都是public的，所以可以通过XXXStage.instance().xxx直接访问。之后，你可以对这些组件的样式，内容或者listener进行修改，或者隐藏（`setVisible(false)`）自己不需要的组件。
+每一个内建的Stage对应的文档里会说明Stage本身的布局（Stage自己就是个JPanel），和Stage里所有添加的组件。  
+所有的组件都是public的，所以可以通过XXXStage.instance().xxx直接访问。之后，你可以对这些组件的样式，内容或者listener进行修改，或者隐藏（`setVisible(false)`）自己不需要的组件。
 
 如果你要自行**添加**组件，请遵循以下几点：
 - 在`View.start()`之前添加到某个panel的组件会出现在所有panel自带的组件之前。（详见初始化过程一节）

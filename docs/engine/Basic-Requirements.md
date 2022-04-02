@@ -9,6 +9,7 @@ https://www.runoob.com/w3cnote/java-inner-class-intro.html
 https://www.runoob.com/java/java8-lambda-expressions.html
 
 我的语文水平有限，而且对java的理解也有限，所以没看懂可以去网上查查，网上讲的肯定比我清楚（仅限本节）。
+本节内容不一定需要完全弄明白，好像根据其他人的经验，对着例子改也能改出来...？
 
 # 匿名内部类
 
@@ -93,5 +94,6 @@ btn.addActionListener((e) -> {
 ```
 就可以避免把这堆烂摊子直接丢在你的gui代码里，让你debug的时候能方便点。
 
-在框架里，你会看到一些类似setSomething, bindSomething，registerSomething的函数。这些函数需要你以lambda表达式的形式提供一个工厂方法。不过，框架里需要你这么做的原因在于：它不知道你的格子或者Action是怎么定义的，需要你根据它提供给你的参数来返回一个实例，告诉它该怎么构建你的格子或者别的什么。  
-一般来说返回一个匿名内部类就好了。
+在框架里，你会看到一些类似setSomething, bindSomething，registerSomething的函数。这些函数需要你以lambda表达式的形式提供一个工厂方法。
+不过，框架里需要你这么做的原因在于：它不知道你的格子或者Action是怎么定义的，需要你根据一些参数来返回一个实例，告诉框架该怎么构建你的格子或者别的什么。  
+一般来说返回一个匿名内部类就好了。看例子。
