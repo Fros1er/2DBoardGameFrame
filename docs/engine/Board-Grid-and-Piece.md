@@ -13,12 +13,11 @@ frame.board
 
 写一个你自己的类继承BaseBoard。这个类的构造函数必须有且仅有两个参数(int width, int height)。 然后你需要实现Board的init方法。  
 然后，如果你想在格子里存棋子之外的东西，写个类继承BaseGrid。你自己的Grid（或者BaseGrid）就是Board.init()里需要往grids里填的东西。  
-再然后，写个棋子类继承BasePiece，存你需要的数据（颜色等）。   
-就这些。你暂时不需要往下看了。
+再然后，写个棋子类继承BasePiece，存你需要的数据（颜色等）。
 
 ## BaseBoard
 
-棋盘，抽象类。
+棋盘，抽象类。棋盘的0,0在左上角。
 
 ### BaseBoard的构造函数
 
@@ -79,4 +78,4 @@ x和y是public final的，可以直接拿去用，但是不能改。
 
 ## BasePiece
 
-棋子，抽象类，里面什么也没有。自己继承然后想写什么就写什么。
+棋子，抽象类，里面只记录了坐标。你需要继承一下然后往里加自己的东西。
