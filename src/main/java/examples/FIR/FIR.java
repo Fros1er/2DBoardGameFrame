@@ -8,7 +8,6 @@ import frame.view.View;
 import frame.view.board.BoardView;
 import frame.view.board.GridPanelView;
 import frame.view.stage.GameStage;
-import frame.view.stage.MenuStage;
 
 import javax.swing.*;
 import java.util.Random;
@@ -57,9 +56,9 @@ public class FIR {
                         // 往格子上丢一个新棋子，颜色。。。0是黑1是白，有点不太优雅但我暂时没有更好的办法
                         // getCurrentPlayerIndex代表当前是第几个玩家，这里是直接拿这个index去碰枚举类里Color的顺序了
                         if (cheating) {
-                            grid.setOwnedPiece(new Piece(cheatingColor));
+                            grid.setOwnedPiece(new Piece(x, y, cheatingColor));
                         } else {
-                            grid.setOwnedPiece(new Piece(Color.values()[Game.getCurrentPlayerIndex()]));
+                            grid.setOwnedPiece(new Piece(x, y, Color.values()[Game.getCurrentPlayerIndex()]));
                         }
                         lastChangedX = x;
                         lastChangedY = y; //看下一条

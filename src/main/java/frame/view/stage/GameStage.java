@@ -64,6 +64,7 @@ public class GameStage extends BaseStage {
     @SuppressWarnings("unchecked")
     @Override
     public void enter() {
+
         Game.init();
         grids.clear();
 
@@ -107,9 +108,15 @@ public class GameStage extends BaseStage {
                 gridView.init();
             }
         }
+        this.board.redraw();
+        this.grids.forEach(GridView::redraw);
+        this.revalidate();
+        this.repaint();
         EventCenter.subscribe(BoardChangeEvent.class, (e) -> {
             this.board.redraw();
             this.grids.forEach(GridView::redraw);
+            this.revalidate();
+            this.repaint();
         });
     }
 

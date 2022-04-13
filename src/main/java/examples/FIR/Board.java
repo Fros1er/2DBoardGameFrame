@@ -18,7 +18,7 @@ public class Board extends BaseBoard {
     public void init() {
         for (int i = 0; i < getWidth(); i++) {
             for (int j = 0; j < getHeight(); j++) {
-                grids[i][j] = new BaseGrid(i, j);
+                grids[i][j] = new Grid(i, j);
             }
         }
     }

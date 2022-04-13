@@ -7,6 +7,7 @@ import frame.event.PlayerLoseEvent;
 import frame.event.PlayerWinEvent;
 import frame.player.Player;
 import frame.util.Procedure;
+import frame.view.board.BoardView;
 import frame.view.board.BoardViewFactory;
 import frame.view.board.GridViewFactory;
 import frame.view.stage.*;
@@ -32,7 +33,7 @@ public class View {
     private static BaseStage currentStage;
 
     public static GridViewFactory gridViewFactory;
-    public static BoardViewFactory boardViewFactory;
+    public static BoardViewFactory boardViewFactory = BoardView::new;
 
     public static Consumer<Player> onPlayerWin = (Player player) -> {};
     public static Consumer<Player> onPlayerLose = (Player player) -> {};
