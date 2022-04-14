@@ -1,6 +1,6 @@
 package examples.chinesechess;
 
-import frame.Game;
+import frame.Controller.Game;
 import frame.board.BasePiece;
 import frame.util.Point2D;
 
@@ -24,11 +24,6 @@ public class Piece extends BasePiece {
         super(x, y);
         this.type = type;
         this.color = color;
-    }
-
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 
     private Color checkBoardPosition(int x, int y) {

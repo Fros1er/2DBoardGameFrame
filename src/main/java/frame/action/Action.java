@@ -10,14 +10,19 @@ public abstract class Action implements Serializable {
 
     public final boolean endTurn;
     private Player changedPlayer;
+    public ActionPerformType type;
 
     public Action(boolean endTurn) {
         this.endTurn = endTurn;
     }
 
-    public abstract boolean perform();
+    public abstract ActionPerformType perform();
 
     public abstract void undo();
+
+    public void removePending() {
+
+    }
 
     public Player getChangedPlayer() {
         return changedPlayer;

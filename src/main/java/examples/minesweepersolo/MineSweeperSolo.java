@@ -1,21 +1,18 @@
 package examples.minesweepersolo;
 
-import frame.Game;
+import frame.Controller.Game;
 import frame.action.Action;
-import frame.board.BaseBoard;
+import frame.action.ActionPerformType;
 import frame.board.BaseGrid;
 import frame.event.BoardChangeEvent;
 import frame.event.EventCenter;
 import frame.view.View;
 import frame.view.board.BoardView;
-import frame.view.board.GridButtonView;
 import frame.view.board.GridPanelView;
 import frame.view.stage.GameStage;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
 
 public class MineSweeperSolo {
 
@@ -42,14 +39,15 @@ public class MineSweeperSolo {
             }
         });
 
-        View.setGridViewPattern((myBaseGrid grid) -> new GridPanelView() {
+        View.setGridViewPattern(() -> new GridPanelView() {
             @Override
             public void init() {
 
             }
 
             @Override
-            public void redraw() {
+            public void redraw(BaseGrid raw) {
+                myBaseGrid grid = (myBaseGrid) raw;
                 if (grid.isOpen) {
 //                    this.setEnabled(false);
                     if (grid.hasMine) {
@@ -72,9 +70,9 @@ public class MineSweeperSolo {
                 case 1:
                     return new Action(true) {
                         @Override
-                        public boolean perform() {
+                        public ActionPerformType perform() {
                             myBaseGrid grid = (myBaseGrid) Game.getBoard().getGrid(x, y);
-                            if (grid.isOpen) return false;
+                            if (grid.isOpen) return ActionPerformType.FAIL;
                             ArrayList<myBaseGrid> bfs = new ArrayList<>();
                             bfs.add(grid);
                             int now = 0;
@@ -94,7 +92,7 @@ public class MineSweeperSolo {
                                 }
                                 now++;
                             }
-                            return true;
+                            return ActionPerformType.SUCCESS;
                         }
 
                         @Override
@@ -105,10 +103,10 @@ public class MineSweeperSolo {
                 case 3:
                     return new Action(true) {
                         @Override
-                        public boolean perform() {
+                        public ActionPerformType perform() {
                             myBaseGrid grid = (myBaseGrid) Game.getBoard().getGrid(x, y);
                             grid.reverseFlag();
-                            return true;
+                            return ActionPerformType.SUCCESS;
                         }
 
                         @Override
@@ -122,7 +120,7 @@ public class MineSweeperSolo {
 
         // --------------------Callbacks--------------------------------
 
-        Game.setGameEndFunction(() -> {
+        Game.setGameEndFunction((withdraw) -> {
             for (int i = 0; i < Game.getBoard().getWidth(); i++) {
                 for (int j = 0; j < Game.getBoard().getHeight(); j++) {
                     myBaseGrid g = (myBaseGrid) Game.getBoard().getGrid(i, j);
@@ -145,7 +143,7 @@ public class MineSweeperSolo {
             return num == 10;
         }));
 
-        Game.setPlayerLosingJudge((player -> {
+        Game.setGameEndingJudge((() -> {
             for (int i = 0; i < Game.getBoard().getWidth(); i++) {
                 for (int j = 0; j < Game.getBoard().getHeight(); j++) {
                     myBaseGrid g = (myBaseGrid) Game.getBoard().getGrid(i, j);
@@ -159,12 +157,6 @@ public class MineSweeperSolo {
         View.setPlayerWinView((player -> {
             JOptionPane.showMessageDialog(GameStage.instance(), "You Win!");
         }));
-        View.setPlayerLoseView((player -> {
-            JOptionPane.showMessageDialog(GameStage.instance(), "You Lose.");
-        }));
-        View.setGameEndView(() -> {
-//            View.changeStage("MenuStage");
-        });
 
         // ------------------------------Menu bar------------------------------------
         JButton resetButton = new JButton("Reset");

@@ -33,9 +33,9 @@
 
 同上，玩家输了的时候触发。
 
-`void setGameEndView(Procedure onGameEnd)`
+`void setGameEndView(Consumer<Boolean> onGameEnd)`
 
-同上，游戏结束时触发。这个里面lambda表达式没有参数。
+同上，游戏结束时触发。传入的boolean代表是否平局。
 
 **如果你刚开始看文档，这一节看到这里就行了。**
 

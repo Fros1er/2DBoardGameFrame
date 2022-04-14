@@ -1,13 +1,12 @@
 package frame.view.components;
 
-import frame.Game;
-import frame.action.ActionFactory;
+import frame.Controller.Game;
 import frame.view.View;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.function.Function;
+import java.io.IOException;
 
 public class SaveDialog {
 
@@ -57,7 +56,11 @@ public class SaveDialog {
         confirmButton.addActionListener((e) -> {
             for (int i = 0; i < radioButtons.length; i++) {
                 if (radioButtons[i].isSelected()) {
-                    Game.saveGame(String.format("./saves/save%d.sav", i + 1));
+                    try {
+                        Game.saver.save(String.format("./saves/save%d.sav", i + 1));
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(dialog, "Failed to save: " + ex.getMessage());
+                    }
                     break;
                 }
             }

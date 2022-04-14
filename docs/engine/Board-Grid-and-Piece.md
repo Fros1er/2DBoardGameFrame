@@ -25,11 +25,18 @@ frame.board
 
 设置宽和高。
 
-### BaseBoard的抽象方法：
+### BaseBoard的方法：
 
 `public abstract void init();`
 
 棋盘的初始化。基本来说就是把你的grid填进去。如果要初始放棋子也是在这里面。看example。
+
+`public BasePiece movePiece(int srcX, int srcY, int destX, int destY);`  
+把棋子从(srcX, srcY)移动到(destX, destY)。  
+如果(srcX, srcY)没棋，或者(destX, destY)没棋，返回null，否则返回(destX, destY)上的棋，然后在棋盘上把它覆盖掉。
+
+`public void forEach(BiConsumer<Point2D, BaseGrid> action);`  
+遍历board。和Map的forEach差不多，不过我没在例子里用。
 
 ### BaseBoard的getter & setter
 

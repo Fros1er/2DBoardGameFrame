@@ -30,14 +30,25 @@ endTurn代表玩家在成功执行这个action之后会结束自己的回合。
 
 ### Action的抽象方法：
 
-`public abstract boolean perform();`  
-这个方法用于实际执行一个Action。boolean代表有没有执行成功。  
-举个例子，五子棋的（唯一一个）Action里，这个方法用来给棋盘上某一个格子上放棋，如果对应格子已经有了棋就返回false。
+`public abstract ActionType perform();`  
+这个方法用于实际执行一个Action，返回一个ActionType。
+举个例子，五子棋的（唯一一个）Action里，这个方法用来给棋盘上某一个格子上放棋，如果对应格子已经有了棋就返回FAIL。
+ActionType和撤销有关。具体如下：
+1. 如果撤销时最后一个执行的Action返回SUCCESS，则撤销这个Action，并撤销这一个和上一个SUCCESS之间的所有PENDING。
+2. 如果撤销时最后一个执行的Action返回PENDING，则撤销上一个SUCCESS之后的所有PENDING。  
+
+另外，如果有一个Action返回FAIL，也撤销上一个SUCCESS之后的所有PENDING。
+
+再举个例子。移动棋子需要先拿起来（指定走的棋子）再放下（落子）。拿起来是一个返回PENDING的Action（不改变棋盘），放下是返回SUCCESS的Action。
+撤销时，如果当前玩家拿起了棋子就让它把棋子放回原位，如果已经下完了，就连着拿起来的动作一起撤销。
 
 `public abstract void undo();`  
-用于撤销上一步的操作。基本就是复原perform干的事情，看example就好。
+用于撤销上一步的操作。基本就是复原返回SUCCESS的perform干的事情，看example就好。
 
-这两个方法不需要手动调用，但你自己（大概率是匿名内部类）的Action需要实现这两个方法。框架会处理好这些。
+`public void removePending()`  
+在PENDING被撤销时调用。还是看example。
+
+这三个方法不需要手动调用，但你自己的Action需要实现其中的两个abstract方法。其他的框架会处理好。
 
 ### Action的getter & setter
 
@@ -91,7 +102,7 @@ EventCenter.subscribe(BoardChangeEvent.class, (e) -> {
 有玩家胜利时触发。触发后会调用View里注册的onPlayerWin方法。
 
 `PlayerLoseEvent`  
-有玩家胜利时触发。触发后会调用View里注册的onPlayerLose方法。
+有玩家失败时触发。触发后会调用View里注册的onPlayerLose方法。
 
 `PlayerChangeEvent`  
 在RoomStage里有玩家姓名或者类型发生变化的时候触发。触发后更新RoomStage里玩家显示，以及如果开启联网对战的话也会更新其他客户端的玩家显示。

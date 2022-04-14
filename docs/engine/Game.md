@@ -7,8 +7,8 @@
 
 进入游戏（进入GameStage）：框架调用Game.init()方法。  
 ↓  
-进行游戏  
-↓
+进行游戏（执行一堆performAction）  
+↓  
 游戏结束（Game.setGameEndingJudge()设置的函数返回true时）
 
 后文会提到进入游戏和游戏结束，意思就是上面提到的部分。
@@ -30,14 +30,6 @@
 `Game.getWidth(); Game.getHeight()`
 
 获取棋盘的宽和高。
-
-`Game.getSlotNumber();`
-
-获取存档栏位数量。
-
-`Game.setSlotNumber();`
-
-设置存档栏位数量。默认为3。
 
 ## 棋盘注册和获取
 
@@ -62,7 +54,7 @@ x, y代表坐标，mouseButton代表点击格子的鼠标按键（1代表左键�
 - 实现Action的perform方法，在那个方法里用getBoard方法获取棋盘，然后依据坐标和鼠标案件操作棋盘（给某些格子上放一个棋子或者删除棋子等等）。
 - 实现Action的undo方法，基本就是把你刚才做的操作反着来一遍。放的棋子删掉，删的棋子放回去。
 
-你在这里不需要考虑前端怎么画。
+在这里不需要考虑前端怎么画，也不要加UI代码。唯一的例外是播放音效。
 
 在给格子注册Action后，玩家在点击这个格子时就会触发你用这个方法设置的Action。你可以先只在返回的Action里写个打印试试。
 
@@ -70,29 +62,30 @@ x, y代表坐标，mouseButton代表点击格子的鼠标按键（1代表左键�
 
 `Game.setPlayerWinningJudge(Predicate<Player> predicate)`  
 
-用于设置用来判断玩家是否胜利的函数，这句话（包括以下类似的）的断句为：用于设置|用来判断玩家是否胜利的函数|(的函数)。  
+用于设置用来判断玩家是否胜利的函数。   
+这句话（包括以下类似的）的断句为：用于设置 | 用来判断玩家是否胜利的函数 | (的函数)。  
 参数是一个传入Player类的lambda表达式，其返回值是boolean，代表当前玩家是否胜利。
 
 `Game.setPlayerLosingJudge(Predicate<Player> predicate)`  
 
 用于设置用来判断玩家是否失败的函数。  
-注意，这里的失败的意思是类似于扫雷踩中了雷，而不是说因为有其他玩家赢了所以这个玩家输了。
+注意，这里的失败的意思是类似于扫雷踩中了雷，或者投降了，而不是说因为有其他玩家赢了所以这个玩家输了。
 一般的棋类游戏里不需要设置这个。
 有一个一直返回false的函数作为默认值，其他同setPlayerWinningJudge。
 
 `Game.setGameEndingJudge(BooleanSupplier supplier)`
 
 用于设置用来判断游戏是否结束的函数。  
-参数是一个没有参数，返回boolean的lambda表达式，true代表游戏结束。
-一般的棋类游戏中有一个玩家胜利游戏即结束，框架里默认也是这种，所以一般不需要设置这个。  
-同时，[PlayerManager](Player.md)中提供了几种默认设置，可以直接传入。
+参数是一个没有参数，返回boolean的lambda表达式，返回true代表游戏结束。
+框架里默认是有人出局（无论输赢）就结束。  
+[PlayerManager](Player.md)中提供了几种默认设置，可以直接传入。不过如果存在平局的设定，需要自己写函数判断。
 
 `setInitFunction(Procedure procedure)`
 
 用于设置游戏初始化时额外执行的函数。  
 参数是一个没有参数没有返回值的lambda表达式。  
 传入的lambda在每次进入游戏时触发一次。  
-一般不需要，我也没想出来可能的用处。  
+一般不需要，我也没想出来可能的用处，但放在这里了。
 
 `setGameEndFunction(Procedure procedure)`
 
@@ -101,7 +94,7 @@ x, y代表坐标，mouseButton代表点击格子的鼠标按键（1代表左键�
 传入的lambda在每次游戏结束时触发一次。  
 一般不需要，可能的用处是扫雷踩雷了以后显示没被标记的雷。
 
-不要在里面写视觉效果。
+视觉效果不要在这里写，View里有个长得很像的函数，在那边写。
 
 ## 玩家相关
 
@@ -109,28 +102,33 @@ x, y代表坐标，mouseButton代表点击格子的鼠标按键（1代表左键�
 
 返回当前回合的玩家（Player实例）。
 
-`Game.getCurrentPlayerIndex()`
+`Game.getCurrentPlayerIndex()`  
+`Game.getNextPlayerIndex()`
 
-返回当前回合的玩家id。可以与自定义的颜色枚举搭配使用。  
+返回当前回合/下一回合的玩家id。可以与自定义的颜色枚举搭配使用。  
 建议参考example。
 
 ## 存档相关
 
-这里的两个函数框架都处理好了。不过如果要自定义UI可能用得上。
+一般不需要使用，框架都处理好了。  
+如果一定需要的话，详见[Saver](Save-and-Saver.md)。  
+Game里有初始化好的默认Saver，`Game.saver`。这个是public static的，直接用就行。
 
-`Game.saveGame(String path)`
+## 其他操作
 
-把当前游戏保存到path指定的文件里。可以用IDEA跳转引用来看框架是如何调用的。
+`Game.init()`
 
-`Game.loadGame(String path)`
-
-缓存path指定的存档，并在下一次进入游戏时读取。单纯调用这个方法不会直接进入游戏。
-
-## 其他操作（不推荐）
-
-`Game.performAction(Action action)`
-
-执行一个Action并判断是否有玩家胜利以及本回合和游戏是否结束。一般框架会帮你处理。不需要手动调。
+进入游戏时自动调用。如果你需要reset按钮，在listener里把你自己的static变量（如果有的话）初始化，然后调用这个。   
+init会干这些事情：
+- 终止之前的读档过程
+- 重新开始游戏，清空之前的action
+- 创建新的Board实例，并调用Board.init()。
+- 调用Game.registerGridAction里传入的lambda表达式给格子注册事件。
+- 复活所有玩家。
+- 调用Game.setInitFunction里传入的的lambda表达式。
+- 如果需要的话，读档并回放之前的步骤。
+- 通知第一个玩家（让AI下棋）。
+- 发布BoardChangeEvent。
 
 `Game.cancelLastAction()`
 
@@ -138,16 +136,10 @@ x, y代表坐标，mouseButton代表点击格子的鼠标按键（1代表左键�
 
 ## 不许手动调用的方法
 
-`Game.init()`
+`Game.performAction(Action action)`
 
-进入游戏时自动调用。会干这些事情（不需要理解）：
-- 创建新的Board实例，并调用Board.init()。
-- 调用Game.registerGridAction里传入的lambda表达式给格子注册事件。
-- 复活所有玩家。
-- 调用Game.setInitFunction里传入的的lambda表达式。
-- 如果loadGame之前被调用，读档并回放之前的步骤。
-- 通知第一个玩家（让AI下棋）。
-- 发布BoardChangeEvent。
+执行一个Action并判断是否有玩家胜利以及本回合和游戏是否结束。一般框架会帮你处理。不需要手动调。
+
 
 `Game.nextTurn()`
 `Game.previousTurn()`

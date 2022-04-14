@@ -1,6 +1,6 @@
 package frame.player;
 
-import frame.Game;
+import frame.Controller.Game;
 import frame.action.SurrenderAction;
 
 import java.io.Serializable;

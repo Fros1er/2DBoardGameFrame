@@ -1,12 +1,11 @@
 package frame.view;
 
-import frame.board.BaseGrid;
 import frame.event.EventCenter;
 import frame.event.GameEndEvent;
 import frame.event.PlayerLoseEvent;
 import frame.event.PlayerWinEvent;
 import frame.player.Player;
-import frame.util.Procedure;
+import frame.player.PlayerManager;
 import frame.view.board.BoardView;
 import frame.view.board.BoardViewFactory;
 import frame.view.board.GridViewFactory;
@@ -37,7 +36,7 @@ public class View {
 
     public static Consumer<Player> onPlayerWin = (Player player) -> {};
     public static Consumer<Player> onPlayerLose = (Player player) -> {};
-    public static Procedure onGameEnd = () -> {};
+    public static Consumer<Boolean> onGameEnd = (withdraw) -> {};
 
     static {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -79,7 +78,7 @@ public class View {
         stages.put(name, jumpTo);
     }
 
-    public static <T extends BaseGrid> void setGridViewPattern(GridViewFactory<T> factory) {
+    public static void setGridViewPattern(GridViewFactory factory) {
         gridViewFactory = factory;
     }
 
@@ -95,7 +94,7 @@ public class View {
         View.onPlayerLose = onPlayerLose;
     }
 
-    public static void setGameEndView(Procedure onGameEnd) {
+    public static void setGameEndView(Consumer<Boolean> onGameEnd) {
         View.onGameEnd = onGameEnd;
     }
 
@@ -111,6 +110,6 @@ public class View {
 
         EventCenter.subscribe(PlayerWinEvent.class, (e) -> onPlayerWin.accept(((PlayerWinEvent) e).getPlayer()));
         EventCenter.subscribe(PlayerLoseEvent.class, (e) -> onPlayerLose.accept(((PlayerLoseEvent) e).getPlayer()));
-        EventCenter.subscribe(GameEndEvent.class, (e) -> onGameEnd.invoke());
+        EventCenter.subscribe(GameEndEvent.class, (e) -> onGameEnd.accept(!PlayerManager.hasPlayerOut()));
     }
 }

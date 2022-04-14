@@ -111,11 +111,11 @@ add开头的两个。手动调的话相当于让这个玩家的记录输一场�
 
 `static PlayerInfo getPlayerInfo(String name);`  
 
-含义显而易见
+获取玩家信息。
 
 `static Collection<PlayerInfo>` getAllPlayersInfo();
 
-同样显而易见。如果要把结果转成List，结果那个变量后面加个`.stream().toList();`就行。
+如果要把结果转成List，结果那个变量后面加个`.stream().toList();`就行。
 
 # 玩家管理
 
@@ -130,14 +130,19 @@ Out: 玩家出局，就是玩家已经赢了或者输了不能再下了。
 ``` java
 isAllPlayerOut();
 isOnePlayerRemains();
-isOnePlayerWin();
-isOnePlayerLose();
+isOnePlayerOut();
+isPlayerRemains(int n);
+isPlayerWins(int n);
+isPlayerLoses(int n);
 ```
-具体含义很清楚。至于怎么用，见`Game.md` 
+
+用于判断胜利条件。  
+一般两人对弈的话，用isOnePlayerRemains，因为可以处理有人胜利和有人投降的情况。  
+注意，对于带out和remains的方法，玩家胜利/失败都是出局。就算按框架里的概念没有写判断玩家输的方法，投降也算是输。
 
 ### PlayerManager的getter & setter
 
 
 ### BaseGrid不推荐使用的方法
 
-没说的都不准用，因为玩家系统本身就写的不太美观，玩家系统+联网对战更加丑陋。。。自己调我没说过的函数等着出一万个bug吧。
+没说的都不准用，因为玩家系统本身就写的不太美观。。。会出一堆bug的。

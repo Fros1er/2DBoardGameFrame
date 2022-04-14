@@ -1,7 +1,8 @@
 package examples.FIR;
 
-import frame.Game;
+import frame.Controller.Game;
 import frame.action.Action;
+import frame.action.ActionPerformType;
 import frame.board.BaseGrid;
 import frame.player.AIPlayer;
 import frame.view.View;
@@ -50,9 +51,9 @@ public class FIR {
                     // 这里还有一些关于作弊模式的判断
                     // 如果开着作弊模式就不结束回合，并且下的棋子颜色由下拉菜单选中的颜色决定
                     @Override
-                    public boolean perform() {
+                    public ActionPerformType perform() {
                         BaseGrid grid = Game.getBoard().getGrid(x, y);
-                        if (grid.hasPiece()) return false; // 棋不能下在已经有棋的格子上
+                        if (grid.hasPiece()) return ActionPerformType.FAIL; // 棋不能下在已经有棋的格子上
                         // 往格子上丢一个新棋子，颜色。。。0是黑1是白，有点不太优雅但我暂时没有更好的办法
                         // getCurrentPlayerIndex代表当前是第几个玩家，这里是直接拿这个index去碰枚举类里Color的顺序了
                         if (cheating) {
@@ -61,8 +62,8 @@ public class FIR {
                             grid.setOwnedPiece(new Piece(x, y, Color.values()[Game.getCurrentPlayerIndex()]));
                         }
                         lastChangedX = x;
-                        lastChangedY = y; //看下一条
-                        return true;
+                        lastChangedY = y; //这两个变量的含义看下一条
+                        return ActionPerformType.SUCCESS;
                     }
 
                     @Override
@@ -145,6 +146,16 @@ public class FIR {
             };
         });
 
+        AIPlayer.addAIType("France", (id) -> {
+            return new AIPlayer(id, "France", 200) {
+                @Override
+                protected boolean calculateNextMove() {
+                   surrender();
+                   return true;
+                }
+            };
+        });
+
         // 6.注册棋盘和格子的样式
         // 棋盘和格子的样式比较特殊，需要单独在这里改
         // 其他的详见这个文件最下面的注释
@@ -169,7 +180,7 @@ public class FIR {
         //格子的样式
         //画棋子是在这里的
         //也可以用来设边框
-        View.setGridViewPattern((grid) -> {
+        View.setGridViewPattern(() -> {
             return new GridPanelView() {
                 // 有两种GridView，看文档
                 @Override
@@ -178,7 +189,7 @@ public class FIR {
                 }
 
                 @Override
-                public void redraw() {
+                public void redraw(BaseGrid grid) {
                     //这个方法在每次格子有变动的时候都会自己调用一遍
                     if (grid.hasPiece()) {
                         Piece piece = (Piece) grid.getOwnedPiece();
@@ -196,12 +207,16 @@ public class FIR {
         View.setPlayerWinView((player -> {
             JOptionPane.showMessageDialog(GameStage.instance(), player.getName() + " Win!");
         }));
+        View.setPlayerLoseView((player -> {
+            JOptionPane.showMessageDialog(GameStage.instance(), player.getName() + " Surrender!");
+        }));
         // 由于是实际游戏中弹的框，所以Dialog的parent是GameStage(确信
         // 当然无脑设成View.window也可以
 
         // 游戏结束时的视觉效果
         // 注意这是整场游戏结束，我的设想是用来做一些跳转或者显示返回主菜单按钮的
-        View.setGameEndView(() -> {
+        // 和棋也是在这里，详见中国象棋那个example
+        View.setGameEndView((withdraw) -> {
 //            View.changeStage("MenuStage");
         });
 

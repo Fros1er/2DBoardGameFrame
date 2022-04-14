@@ -1,55 +1,24 @@
 package frame.save;
 
-import frame.player.PlayerInfo;
+import java.io.IOException;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+public abstract class Saver {
 
-public class Saver {
+    public abstract Save getLoadedSave();
 
-    public static Save load(String path) {
-        try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(path));
-            return (Save) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    public abstract boolean hasLoadedSave();
 
-    public static void save(Save save, String path) {
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path));
-            out.writeObject(save);
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    public abstract void clearLoadedSave();
 
-    @SuppressWarnings("unchecked")
-    public static Map<String, PlayerInfo> loadPlayerInfo() {
-        try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream("players.sav"));
-            return (Map<String, PlayerInfo>) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return new HashMap<>();
-    }
+    /**
+     * Load save from file.
+     * @param path save to be loaded.
+     * @throws ClassNotFoundException when deserialization fails.
+     * @throws UnmatchedSizeException when checkSize is enabled and size doesn't match.
+     */
+    public abstract void load(String path) throws IOException, ClassNotFoundException, UnmatchedSizeException;
 
-    public static void savePlayerInfo(Map<String, PlayerInfo> info) {
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("players.sav"));
-            out.writeObject(info);
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    public abstract void save(String path) throws IOException;
 
-    public static String getSaveInfo() {
-        return "";//TODO
-    }
+    public abstract void checkSize(boolean flag);
 }

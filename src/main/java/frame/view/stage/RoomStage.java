@@ -1,6 +1,6 @@
 package frame.view.stage;
 
-import frame.Game;
+import frame.Controller.Game;
 import frame.view.View;
 import frame.view.components.RoomBlock;
 

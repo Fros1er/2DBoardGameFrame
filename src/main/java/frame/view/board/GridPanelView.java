@@ -1,11 +1,10 @@
 package frame.view.board;
 
-import frame.Game;
+import frame.Controller.Game;
+import frame.board.BaseGrid;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class GridPanelView extends JPanel implements GridView {
 
@@ -23,7 +22,7 @@ public abstract class GridPanelView extends JPanel implements GridView {
     public abstract void init();
 
     @Override
-    public abstract void redraw();
+    public abstract void redraw(BaseGrid grid);
 
     @Override
     public Dimension getPreferredSize() {

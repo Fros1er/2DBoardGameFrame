@@ -1,6 +1,6 @@
 package frame.player;
 
-import frame.Game;
+import frame.Controller.Game;
 
 import java.util.HashMap;
 import java.util.Map;

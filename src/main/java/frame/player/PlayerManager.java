@@ -1,6 +1,6 @@
 package frame.player;
 
-import frame.save.Saver;
+import frame.Controller.DefaultSaver;
 import frame.event.EventCenter;
 import frame.event.GameEndEvent;
 import frame.event.PlayerChangeEvent;
@@ -15,7 +15,7 @@ public class PlayerManager {
     private static final Map<String, PlayerInfo> playerInfoMap;
 
     static {
-        playerInfoMap = Saver.loadPlayerInfo();
+        playerInfoMap = DefaultSaver.loadPlayerInfo();
         EventCenter.subscribe(GameEndEvent.class, (e) -> updatePlayerInfo());
     }
 
@@ -51,12 +51,20 @@ public class PlayerManager {
         return Arrays.stream(players).filter((player) -> !player.isOut()).count() == 1;
     }
 
-    public static boolean isOnePlayerWin() {
-        return Arrays.stream(players).filter((player) -> !player.isWin()).count() == 1;
+    public static boolean hasPlayerOut() {
+        return Arrays.stream(players).anyMatch((player) -> !player.isOut());
     }
 
-    public static boolean isOnePlayerLose() {
-        return Arrays.stream(players).filter((player) -> !player.isLose()).count() == 1;
+    public static boolean isPlayerRemains(int n) {
+        return Arrays.stream(players).filter((player) -> !player.isOut()).count() == n;
+    }
+
+    public static boolean isPlayerWins(int n) {
+        return Arrays.stream(players).filter((player) -> !player.isWin()).count() == n;
+    }
+
+    public static boolean isPlayerLoses(int n) {
+        return Arrays.stream(players).filter((player) -> !player.isLose()).count() == n;
     }
 
     public static Player getCurrentPlayer() {
@@ -64,6 +72,15 @@ public class PlayerManager {
     }
 
     public static int getCurrentPlayerIndex() {
+        return currentPlayer;
+    }
+
+    public static int getNextPlayerIndex() {
+        for (int i = 1; i < players.length; i++) {
+            if (!players[(currentPlayer + i) % players.length].isOut()) {
+                return (currentPlayer + i) % players.length;
+            }
+        }
         return currentPlayer;
     }
 
@@ -94,6 +111,11 @@ public class PlayerManager {
         for (Player p : players) p.revive();
     }
 
+    public static void reset() {
+        reviveAllPlayers();
+        currentPlayer = 0;
+    }
+
     public static PlayerInfo getPlayerInfo(String name) {
         if (playerInfoMap.containsKey(name)) {
             return playerInfoMap.get(name);
@@ -112,6 +134,6 @@ public class PlayerManager {
             if (player.isWin()) playerInfoMap.get(player.getName()).addWinCount();
             else playerInfoMap.get(player.getName()).addLoseCount();
         }
-        Saver.savePlayerInfo(playerInfoMap);
+        DefaultSaver.savePlayerInfo(playerInfoMap);
     }
 }

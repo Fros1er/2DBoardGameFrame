@@ -1,10 +1,11 @@
 package frame.view.stage;
 
-import frame.Game;
-import frame.board.BaseGrid;
+import frame.Controller.Game;
 import frame.board.BaseBoard;
-import frame.event.EventCenter;
+import frame.board.BaseGrid;
 import frame.event.BoardChangeEvent;
+import frame.event.EventCenter;
+import frame.event.InvalidLoadEvent;
 import frame.player.PlayerType;
 import frame.view.View;
 import frame.view.board.BoardView;
@@ -15,7 +16,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.function.Consumer;
 
 public class GameStage extends BaseStage {
     private static volatile GameStage sInstance = null;
@@ -27,20 +29,26 @@ public class GameStage extends BaseStage {
     public final JButton menuButton = new JButton("Menu");
     public final JButton undoButton = new JButton("Undo");
     public final JButton saveButton = new JButton("Save");
+    public final JButton surrenderButton = new JButton("Surrender");
 
     public final SaveDialog saveDialog = new SaveDialog();
 
-    public final ArrayList<GridView> grids = new ArrayList<>();
+    private GridView[][] grids;
 
     private boolean enableClick = true;
 
     public void disableMouseClick() {
-         enableClick = false;
+        enableClick = false;
     }
 
     public void enableMouseClick() {
-         enableClick = true;
+        enableClick = true;
     }
+
+    public Consumer<EventObject> invalidLoadCallback = (e) -> {
+        JOptionPane.showMessageDialog(this, "Load failed: Invalid action.");
+        View.changeStage("MenuStage");
+    };
 
     private GameStage() {
         super("GameStage");
@@ -49,6 +57,7 @@ public class GameStage extends BaseStage {
         menuButton.addActionListener((e) -> View.changeStage("MenuStage"));
         undoButton.addActionListener((e) -> Game.cancelLastAction());
         saveButton.addActionListener((e) -> saveDialog.dialog.setVisible(true));
+        surrenderButton.addActionListener(e -> Game.getCurrentPlayer().surrender());
         saveDialog.dialog.setLocationRelativeTo(this);
 
         drawComponents = () -> {
@@ -60,13 +69,18 @@ public class GameStage extends BaseStage {
         };
     }
 
+    @Override
+    public void init() {
+        super.init();
+        EventCenter.subscribe(InvalidLoadEvent.class, invalidLoadCallback);
+    }
 
-    @SuppressWarnings("unchecked")
+
     @Override
     public void enter() {
 
         Game.init();
-        grids.clear();
+        grids = new GridView[Game.getBoard().getWidth()][Game.getBoard().getHeight()];
 
         if (this.board != null)
             this.remove(this.board);
@@ -78,8 +92,8 @@ public class GameStage extends BaseStage {
         for (int i = 0; i < board.getWidth(); i++) {
             for (int j = 0; j < board.getHeight(); j++) {
                 BaseGrid baseGrid = board.getGrid(i, j);
-                GridView gridView = View.gridViewFactory.createGridView(baseGrid);
-                grids.add(gridView);
+                GridView gridView = View.gridViewFactory.createGridView();
+                grids[i][j] = gridView;
                 Component gridViewComponent = (Component) gridView;
                 int finalI = i;
                 int finalJ = j;
@@ -108,16 +122,21 @@ public class GameStage extends BaseStage {
                 gridView.init();
             }
         }
+        redrawBoard();
+        EventCenter.subscribe(BoardChangeEvent.class, (e) -> redrawBoard());
+    }
+
+
+    private void redrawBoard() {
+        if (this.grids[0][0] == null) return;
         this.board.redraw();
-        this.grids.forEach(GridView::redraw);
+        for (int i = 0; i < Game.getWidth(); i++) {
+            for (int j = 0; j < Game.getHeight(); j++) {
+                this.grids[i][j].redraw(Game.getBoard().getGrid(i, j));
+            }
+        }
         this.revalidate();
         this.repaint();
-        EventCenter.subscribe(BoardChangeEvent.class, (e) -> {
-            this.board.redraw();
-            this.grids.forEach(GridView::redraw);
-            this.revalidate();
-            this.repaint();
-        });
     }
 
     public static GameStage instance() {

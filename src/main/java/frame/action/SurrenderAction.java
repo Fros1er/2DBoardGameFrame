@@ -1,6 +1,7 @@
 package frame.action;
 
-import frame.Game;
+import frame.event.EventCenter;
+import frame.event.PlayerLoseEvent;
 import frame.player.Player;
 
 public class SurrenderAction extends Action{
@@ -11,16 +12,17 @@ public class SurrenderAction extends Action{
     }
 
     @Override
-    public boolean perform() {
+    public ActionPerformType perform() {
         if (!owner.isOut()) {
             setChangedPlayer(owner);
             owner.lose();
+            EventCenter.publish(new PlayerLoseEvent(this, owner));
         }
-        return true;
+        return ActionPerformType.SUCCESS;
     }
 
     @Override
     public void undo() {
-
+        owner.revive();
     }
 }

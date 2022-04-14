@@ -1,12 +1,10 @@
 package frame.view.stage;
 
 
-import frame.Game;
 import frame.view.View;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 public class MenuStage extends BaseStage {
     private static volatile MenuStage sInstance = null;
