@@ -53,3 +53,7 @@
 - [LoadStage](display/LoadStage.md)
 - [GameStage](display/GameStage.md)
 - [RankingStage](display/RankingStage.md)
+
+#### ~~一个神奇的文档~~
+
+[~~分数列表~~](score.md)
