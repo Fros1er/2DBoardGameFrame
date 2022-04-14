@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>2DBoardGameFrame</artifactId>
-    <version>0.2.0-Alpha</version>
+    <version>0.2.1-Alpha</version>
     <properties>
         <maven.compiler.release>9</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,6 +15,21 @@
         <maven.compiler.target>1.9</maven.compiler.target>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.googlecode.soundlibs</groupId>
+            <artifactId>tritonus-share</artifactId>
+            <version>0.3.7-2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.soundlibs</groupId>
+            <artifactId>mp3spi</artifactId>
+            <version>1.9.5-1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.soundlibs</groupId>
+            <artifactId>vorbisspi</artifactId>
+            <version>1.0.3-1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -44,6 +44,9 @@
 [Stage](display/Stage.md)  
 [前端的控制器](display/View.md)  
 [棋盘和格子的前端](display/Board.md)  
+[音乐播放器](display/Music.md)
+[杂项](display/Misc.md)
+
 #### 各种Stage：
 - [MenuStage](display/MenuStage.md)
 - [RoomStage](display/RoomStage.md)

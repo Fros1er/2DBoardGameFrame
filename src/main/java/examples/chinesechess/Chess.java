@@ -11,6 +11,7 @@ import frame.util.Point2D;
 import frame.view.View;
 import frame.view.board.BoardView;
 import frame.view.board.GridPanelView;
+import frame.view.sound.AudioPlayer;
 import frame.view.stage.GameStage;
 import frame.view.stage.MenuStage;
 
@@ -40,6 +41,9 @@ public class Chess {
         Game.setBoardSize(9, 10);
         Game.saver.checkSize(true); // 读档时检查存档棋盘大小
 
+//        AudioPlayer.playBgm("src/main/resources/aaa.mp3"); //播放bgm
+//        GameStage.instance().setBgm("src/main/resources/aaa.mp3"); // 在进入GameStage时播放bgm
+
         Game.registerBoard(Board.class);
 
         // 基本流程：点一下选中棋子，高亮可以走的格子，然后点高亮的格子落子
@@ -68,6 +72,7 @@ public class Chess {
                             availablePositions = piece.getAvailablePositions(); // 拿所有能走的格子，存到全局变量
                             selectedPiece = piece; // 全局变量存被选中的棋子
                             isSelecting = true;
+//                            AudioPlayer.playSound("src/main/resources/bbb.mp3"); //点击音效
                             return ActionPerformType.PENDING; // 执行结果为PENDING，玩家这一步对棋盘没有更改，需要之后的Action
                             // 撤销或者FAIL时会把之前所有的PENDING都撤掉，详见文档
                         } else { // 选中棋子的时候
@@ -82,6 +87,7 @@ public class Chess {
                                     }
                                     selectedPiece = null; // 清理全局变量
                                     availablePositions.clear();
+//                                    AudioPlayer.playSound("src/main/resources/ccc.mp3"); //点击音效
                                     return ActionPerformType.SUCCESS; // Action执行成功
                                 }
                             }
