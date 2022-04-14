@@ -13,7 +13,7 @@ import java.awt.event.MouseEvent;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class RoomBlock extends JPanel {
+public class RoomBlock extends BackgroundImagePanel {
 
     public final int id;
     protected static Consumer<RoomBlock> drawComponents = (RoomBlock roomBlock) -> {

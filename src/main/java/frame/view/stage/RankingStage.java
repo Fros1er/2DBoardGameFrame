@@ -3,6 +3,7 @@ package frame.view.stage;
 import frame.player.PlayerInfo;
 import frame.player.PlayerManager;
 import frame.view.View;
+import frame.view.components.BackgroundImagePanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -14,8 +15,8 @@ public class RankingStage extends BaseStage {
     private static volatile RankingStage sInstance = null;
 
     public final JLabel title = new JLabel("Rank", JLabel.CENTER);
-    public final JPanel titlePanel = new JPanel();
-    public final JPanel buttonPanel = new JPanel();
+    public final BackgroundImagePanel titlePanel = new BackgroundImagePanel();
+    public final BackgroundImagePanel buttonPanel = new BackgroundImagePanel();
     public final JTable rankingTable;
     public final JScrollPane rankingPanel;
     public final JButton back = new JButton("Back");

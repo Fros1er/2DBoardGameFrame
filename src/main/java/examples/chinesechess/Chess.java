@@ -9,12 +9,18 @@ import frame.event.EventCenter;
 import frame.player.PlayerManager;
 import frame.util.Point2D;
 import frame.view.View;
+import frame.view.board.BoardView;
 import frame.view.board.GridPanelView;
 import frame.view.stage.GameStage;
+import frame.view.stage.MenuStage;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 // 建议在阅读FIR那个例子后再看这个。
@@ -136,9 +142,19 @@ public class Chess {
             // 如果都不能走则平局。
             return true;
         });
+        try {
+            // 设置背景图片。BoardView有个构造函数支持直接设置。其他所有JPanel都是魔改过的，可以直接加图片。
+            Image image = ImageIO.read(new File("src/main/resources/bg.jpeg"));
+            Image image2 = ImageIO.read(new File("src/main/resources/bg2.jpg"));
+            View.setBoardViewPattern(() -> new BoardView(image) {});
+            MenuStage.instance().setBackgroundImage(image2);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         View.setGridViewPattern(() -> new GridPanelView() {
             boolean isHighLighted = false, hasMouseEntered = false;
+
             @Override
             public void init() {
                 // 这里是鼠标移动到格子上时高亮

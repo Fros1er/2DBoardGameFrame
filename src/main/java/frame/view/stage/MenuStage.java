@@ -2,6 +2,7 @@ package frame.view.stage;
 
 
 import frame.view.View;
+import frame.view.components.BackgroundImagePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +18,7 @@ public class MenuStage extends BaseStage {
     public JButton quit = new JButton("Quit");
 
     public Box buttonPanel = new Box(BoxLayout.Y_AXIS);
-    public JPanel dummyPanel = new JPanel();
+    public BackgroundImagePanel dummyPanel = new BackgroundImagePanel();
 
     private MenuStage() {
         super("MenuStage");

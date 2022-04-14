@@ -2,6 +2,7 @@ package frame.view.stage;
 
 import frame.Controller.Game;
 import frame.view.View;
+import frame.view.components.BackgroundImagePanel;
 import frame.view.components.RoomBlock;
 
 import javax.swing.*;
@@ -11,9 +12,9 @@ import javax.swing.event.DocumentListener;
 public class RoomStage extends BaseStage {
     private static volatile RoomStage sInstance = null;
 
-    public final JPanel settingsRow = new JPanel();
-    public final JPanel playerRows = new JPanel();
-    public final JPanel buttonRows = new JPanel();
+    public final BackgroundImagePanel settingsRow = new BackgroundImagePanel();
+    public final BackgroundImagePanel playerRows = new BackgroundImagePanel();
+    public final BackgroundImagePanel buttonRows = new BackgroundImagePanel();
 
     public RoomBlock[] roomBlocks = null;
     public final JButton back = new JButton("Back");

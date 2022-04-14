@@ -1,10 +1,9 @@
 package frame.view.stage;
 
 import frame.util.Procedure;
+import frame.view.components.BackgroundImagePanel;
 
-import javax.swing.*;
-
-public abstract class BaseStage extends JPanel {
+public abstract class BaseStage extends BackgroundImagePanel {
     private final String name;
     protected Procedure drawComponents;
     public BaseStage(String name) {

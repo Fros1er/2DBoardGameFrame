@@ -10,6 +10,7 @@ import frame.player.PlayerType;
 import frame.view.View;
 import frame.view.board.BoardView;
 import frame.view.board.GridView;
+import frame.view.components.BackgroundImagePanel;
 import frame.view.components.SaveDialog;
 
 import javax.swing.*;
@@ -22,9 +23,9 @@ import java.util.function.Consumer;
 public class GameStage extends BaseStage {
     private static volatile GameStage sInstance = null;
 
-    public final JPanel menuBar = new JPanel();
+    public final BackgroundImagePanel menuBar = new BackgroundImagePanel();
     public BoardView board;
-    public final JPanel scoreBoard = new JPanel();
+    public final BackgroundImagePanel scoreBoard = new BackgroundImagePanel();
 
     public final JButton menuButton = new JButton("Menu");
     public final JButton undoButton = new JButton("Undo");

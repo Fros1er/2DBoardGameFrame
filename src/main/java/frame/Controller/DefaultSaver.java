@@ -45,10 +45,14 @@ public class DefaultSaver extends Saver {
     @Override
     public void load(String path) throws IOException, ClassNotFoundException, UnmatchedSizeException {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(path));
-        loadedSave = (Save) in.readObject();
-        if (!loadedSave.boardClass.equals(Game.boardClass)) throw new ClassNotFoundException();
-        if (checkSize && (loadedSave.height != Game.getHeight() || loadedSave.width != Game.getWidth()))
-            throw new UnmatchedSizeException(Game.getWidth(), Game.getHeight(), loadedSave.width, loadedSave.height);
+        try {
+            loadedSave = (Save) in.readObject();
+            if (!loadedSave.boardClass.equals(Game.boardClass)) throw new ClassNotFoundException();
+            if (checkSize && (loadedSave.height != Game.getHeight() || loadedSave.width != Game.getWidth()))
+                throw new UnmatchedSizeException(Game.getWidth(), Game.getHeight(), loadedSave.width, loadedSave.height);
+        } catch (ClassCastException ignored) {
+            throw new ClassNotFoundException();
+        }
     }
 
     @Override

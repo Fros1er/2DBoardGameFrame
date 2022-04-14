@@ -30,6 +30,8 @@ Stage中所有的Component会在构造函数中创建完毕，并设置好有关
 每一个内建的Stage对应的文档里会说明Stage本身的布局（Stage自己就是个JPanel），和Stage里所有添加的组件。  
 所有的组件都是public的，所以可以通过XXXStage.instance().xxx直接访问。之后，你可以对这些组件的样式，内容或者listener进行修改，或者隐藏（`setVisible(false)`）自己不需要的组件。
 
+Stage本身就是个[BackgroundImagePanel](Misc.md)，且所有的Stage里的Panel都是BackgroundImagePanel,所以可以方便的设背景图片。
+
 如果你要自行**添加**组件，请遵循以下几点：
 - 在`View.start()`之前添加到某个panel的组件会出现在所有panel自带的组件之前。（详见初始化过程一节）
 - 在`View.start()`之后添加到某个panel的组件会出现在所有panel自带的组件之后。（详见初始化过程一节）

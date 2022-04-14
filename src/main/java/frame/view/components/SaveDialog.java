@@ -12,10 +12,10 @@ public class SaveDialog {
 
     public final JDialog dialog = new JDialog(View.window, "Select Slot", true);
     public final JLabel headLabel = new JLabel("Please select slot");
-    public static final JPanel[] slotPanels = new JPanel[Game.getSlotNumber()];
+    public static final BackgroundImagePanel[] slotPanels = new BackgroundImagePanel[Game.getSlotNumber()];
     public static final JRadioButton[] radioButtons = new JRadioButton[Game.getSlotNumber()];
 
-    public final JPanel buttonPanel = new JPanel();
+    public final BackgroundImagePanel buttonPanel = new BackgroundImagePanel();
     public final JButton confirmButton = new JButton("Save");
     public final JButton cancelButton = new JButton("Cancel");
 
@@ -25,7 +25,7 @@ public class SaveDialog {
         dialog.add(headLabel);
         ButtonGroup group = new ButtonGroup();
         for (int i = 0; i < Game.getSlotNumber(); i++) {
-            JPanel panel = new JPanel();
+            BackgroundImagePanel panel = new BackgroundImagePanel();
             JRadioButton select = new JRadioButton();
             radioButtons[i] = select;
             group.add(select);
