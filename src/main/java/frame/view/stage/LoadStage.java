@@ -53,8 +53,8 @@ public class LoadStage extends BaseStage {
         drawComponents = () -> {
             this.add(dummyPanel);
             this.add("North", title);
-            saveButtons = new JButton[Game.getSlotNumber()];
-            for (int i = 0; i < Game.getSlotNumber(); i++) {
+            saveButtons = new JButton[Game.saver.getSlotNumber()];
+            for (int i = 0; i < Game.saver.getSlotNumber(); i++) {
                 JButton load = new JButton("Load " + (i + 1));
                 int finalI = i;
                 load.addActionListener((e) -> {

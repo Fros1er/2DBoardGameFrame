@@ -40,6 +40,7 @@ public class Chess {
         View.setName("Chinese Chess");
         Game.setBoardSize(9, 10);
         Game.saver.checkSize(true); // 读档时检查存档棋盘大小
+        Game.saver.setSlotNumber(5); // 存档数量
 
 //        AudioPlayer.playBgm("src/main/resources/aaa.mp3"); //播放bgm
 //        GameStage.instance().setBgm("src/main/resources/aaa.mp3"); // 在进入GameStage时播放bgm

@@ -4,6 +4,8 @@ import java.io.IOException;
 
 public abstract class Saver {
 
+    private int slotNumber = 3;
+
     public abstract Save getLoadedSave();
 
     public abstract boolean hasLoadedSave();
@@ -21,4 +23,12 @@ public abstract class Saver {
     public abstract void save(String path) throws IOException;
 
     public abstract void checkSize(boolean flag);
+
+    public void setSlotNumber(int slotNumber) {
+        this.slotNumber = slotNumber;
+    }
+
+    public int getSlotNumber() {
+        return this.slotNumber;
+    }
 }

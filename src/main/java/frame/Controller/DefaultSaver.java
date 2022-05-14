@@ -1,6 +1,5 @@
 package frame.Controller;
 
-import frame.Controller.Game;
 import frame.player.PlayerInfo;
 import frame.save.Save;
 import frame.save.Saver;
@@ -65,6 +64,8 @@ public class DefaultSaver extends Saver {
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream("players.sav"));
             return (Map<String, PlayerInfo>) in.readObject();
+        } catch (FileNotFoundException ignored) {
+
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

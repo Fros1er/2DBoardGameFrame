@@ -32,7 +32,7 @@ public class GameStage extends BaseStage {
     public final JButton saveButton = new JButton("Save");
     public final JButton surrenderButton = new JButton("Surrender");
 
-    public final SaveDialog saveDialog = new SaveDialog();
+    public SaveDialog saveDialog = null;
 
     private GridView[][] grids;
 
@@ -57,9 +57,7 @@ public class GameStage extends BaseStage {
 
         menuButton.addActionListener((e) -> View.changeStage("MenuStage"));
         undoButton.addActionListener((e) -> Game.cancelLastAction());
-        saveButton.addActionListener((e) -> saveDialog.dialog.setVisible(true));
         surrenderButton.addActionListener(e -> Game.getCurrentPlayer().surrender());
-        saveDialog.dialog.setLocationRelativeTo(this);
 
         drawComponents = () -> {
             menuBar.add(menuButton);
@@ -73,6 +71,9 @@ public class GameStage extends BaseStage {
     @Override
     public void init() {
         super.init();
+        saveDialog = new SaveDialog();
+        saveButton.addActionListener((e) -> saveDialog.dialog.setVisible(true));
+        saveDialog.dialog.setLocationRelativeTo(this);
         EventCenter.subscribe(InvalidLoadEvent.class, invalidLoadCallback);
     }
 

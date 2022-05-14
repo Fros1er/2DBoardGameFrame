@@ -17,3 +17,5 @@ cheat mode是样例在main函数里加的。
 ![](images/SaveDialog.png)
 
 布局是BoxLayout。
+
+saveDialog是在View.Start()时初始化的，这个之后会改。。。如果要改里面的组件记得先init。

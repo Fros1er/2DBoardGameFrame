@@ -6,7 +6,6 @@ import frame.action.ActionPerformType;
 import frame.action.Range;
 import frame.board.BaseBoard;
 import frame.event.*;
-import frame.network.NetworkHandler;
 import frame.player.Player;
 import frame.player.PlayerManager;
 import frame.save.Saver;
@@ -38,10 +37,7 @@ public class Game {
     };
     private static int width;
     private static int height;
-    //TODO: make slotNumber useful
-    private static int slotNumber = 3;
     private static boolean netWorkEnabled = false;
-    private static NetworkHandler networkHandler;
     public static Saver saver = new DefaultSaver();
 
     public static final Object controllerSource = new Object();
@@ -62,14 +58,6 @@ public class Game {
 
     public static int getWidth() {
         return width;
-    }
-
-    public static int getSlotNumber() {
-        return slotNumber;
-    }
-
-    public static void setSlotNumber(int slotNumber) {
-        Game.slotNumber = slotNumber;
     }
 
     // Board methods
