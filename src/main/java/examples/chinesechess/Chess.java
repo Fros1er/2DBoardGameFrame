@@ -11,6 +11,7 @@ import frame.util.Point2D;
 import frame.view.View;
 import frame.view.board.BoardView;
 import frame.view.board.GridPanelView;
+import frame.view.components.BackgroundImagePanel;
 import frame.view.sound.AudioPlayer;
 import frame.view.stage.GameStage;
 import frame.view.stage.MenuStage;
@@ -121,6 +122,37 @@ public class Chess {
             }
             return null; // 其他鼠标按键返回null
         });
+
+        // 加一个按钮，可以把兵变成🏇。我也不知道为什么要加这个(
+        BackgroundImagePanel sidePanel = new BackgroundImagePanel();
+        JButton someButton = new JButton("Promotion");
+        someButton.addActionListener((e) -> { // 手动写一个按钮，按下时调用Game.performAction，然后继承一个Action传进去
+            Game.performAction(new Action(true) {
+                Piece changedPiece = null; // 记录被升变的棋子
+                @Override
+                public ActionPerformType perform() {
+                    if (!isSelecting) return ActionPerformType.FAIL; // 没选中或不是兵返回FAIL
+                    if (selectedPiece.getType() != Piece.PieceType.BING) {
+                        selectedPiece = null; // 清理全局变量
+                        availablePositions.clear();
+                        return ActionPerformType.FAIL;
+                    }
+                    changedPiece = selectedPiece; // 记录改变的棋子，方便撤回
+                    selectedPiece.setType(Piece.PieceType.MA); // 改变type
+                    selectedPiece = null; // 清理全局变量
+                    availablePositions.clear();
+                    return ActionPerformType.SUCCESS;
+                }
+
+                @Override
+                public void undo() {
+                    changedPiece.setType(Piece.PieceType.BING); // 把记下来的棋子改回兵
+                }
+            });
+        });
+        sidePanel.add(someButton);
+        GameStage.instance().add("East", sidePanel); // GameStage的布局管理器是BorderPanel，可以在东西南北添加Panel。框架在南北提供了两个，这里是在东边添加。
+
 
         // 胜利条件：刚才被吃的是将/帅，则吃子的玩家赢
         Game.setPlayerWinningJudge((player -> {

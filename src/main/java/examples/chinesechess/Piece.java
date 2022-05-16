@@ -17,7 +17,7 @@ public class Piece extends BasePiece {
         BING
     }
 
-    private final PieceType type;
+    private PieceType type;
     private final Color color;
 
     public Piece(int x, int y, PieceType type, Color color) {
@@ -109,6 +109,10 @@ public class Piece extends BasePiece {
 
     public PieceType getType() {
         return type;
+    }
+
+    public void setType(PieceType type) {
+        this.type = type;
     }
 
     public int getX() {
