@@ -4,12 +4,18 @@ import javax.swing.*;
 import java.awt.*;
 
 public class BackgroundImagePanel extends JPanel {
-    private Image image;
+    protected Image image;
     public BackgroundImagePanel() {
         this(null);
     }
 
     public BackgroundImagePanel(Image background) {
+        this.image = background;
+        this.setOpaque(false);
+    }
+
+    public BackgroundImagePanel(Image background, LayoutManager layout) {
+        super(layout);
         this.image = background;
         this.setOpaque(false);
     }
