@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class DefaultSaver extends Saver {
 
-    private Save loadedSave = null;
-    private boolean checkSize = false;
+    protected Save loadedSave = null;
+    protected boolean checkSize = false;
 
     public DefaultSaver() {
 

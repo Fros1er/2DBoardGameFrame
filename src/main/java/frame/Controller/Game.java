@@ -8,6 +8,7 @@ import frame.board.BaseBoard;
 import frame.event.*;
 import frame.player.Player;
 import frame.player.PlayerManager;
+import frame.save.Save;
 import frame.save.Saver;
 import frame.util.Procedure;
 import frame.view.View;
@@ -248,5 +249,9 @@ public class Game {
 
     public static void disableNetwork() {
         netWorkEnabled = false;
+    }
+
+    public static Save getSaveObject() {
+        return new Save(Game.boardClass, Game.actionStack);
     }
 }
