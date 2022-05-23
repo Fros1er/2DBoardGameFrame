@@ -181,6 +181,15 @@ public class Chess {
             // 如果都不能走则平局。
             return true;
         });
+
+        // 自定义初始化函数。这里的东西每局游戏开始前会调用一次，可以用来清空全局变量。
+        Game.setInitFunction(() -> {
+            isSelecting = false;
+            selectedPiece = null;
+            availablePositions = new ArrayList<>();
+            lastRemovedPieceType = null;
+        });
+
         try {
             // 设置背景图片。BoardView有个构造函数支持直接设置。其他所有JPanel都是魔改过的，可以直接加图片。
             Image image = ImageIO.read(new File("src/main/resources/bg.jpeg"));
@@ -273,10 +282,6 @@ public class Chess {
         // 重置，框架的部分调用Game.init()就行。不过还要重置全局变量。
         JButton reset = new JButton("Reset");
         reset.addActionListener((e) -> {
-            isSelecting = false;
-            selectedPiece = null;
-            availablePositions = new ArrayList<>();
-            lastRemovedPieceType = null;
             Game.init();
         });
 
